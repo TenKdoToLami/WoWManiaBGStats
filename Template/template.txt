@@ -1,0 +1,10 @@
+
+location: WoW-Mania PvPstats.html
+https://wow-mania.org/pvpstats/redemption/battleground.php?id=5560
+
+
+
+bgs are in place of 
+https://wow-mania.org/pvpstats/redemption/battleground.php?id=NUMBER
+
+latest one is 27674

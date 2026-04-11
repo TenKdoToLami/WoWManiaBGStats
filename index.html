@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoW-Mania BG Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+</head>
+<body>
+    <div class="background-glow"></div>
+    <div class="container">
+        <header>
+            <h1><span class="highlight">WoW-Mania</span> Battleground Analytics</h1>
+            <p>Data scraped directly from WoW-Mania PvP rankings. Tracking <span id="total-matches">...</span> matches and <span id="total-players">...</span> players.</p>
+        </header>
+
+        <div class="dashboard">
+            <!-- Overall overview card -->
+            <div class="card stat-card full-width">
+                <h2>Faction Dominance</h2>
+                <div class="stat-content">
+                    <div class="faction horde">
+                        <img src="img/horde_min.png" alt="Horde">
+                        <div class="faction-data">
+                            <h3>Horde</h3>
+                            <p class="win-count" id="horde-wins">0</p>
+                            <span class="label">Wins</span>
+                        </div>
+                    </div>
+                    
+                    <div class="vs"><h2>VS</h2></div>
+                    
+                    <div class="faction alliance">
+                        <div class="faction-data right">
+                            <h3>Alliance</h3>
+                            <p class="win-count" id="alliance-wins">0</p>
+                            <span class="label">Wins</span>
+                        </div>
+                        <img src="img/alliance_min.png" alt="Alliance">
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar horde-bar" id="dom-horde-bar" style="width: 50%;"></div>
+                    <div class="progress-bar alliance-bar" id="dom-alliance-bar" style="width: 50%;"></div>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h2>Battlegrounds Played & Win Rate</h2>
+                <div class="chart-container">
+                    <canvas id="bgChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <h2>Class Popularity & Average Demographics</h2>
+                <div class="chart-container">
+                    <canvas id="classChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card chart-card full-width">
+                <h2>Average Damage & Healing per Class</h2>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/main.js"></script>
+</body>
+</html>

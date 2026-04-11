@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PvPstats, see who is winning!">
+  <meta name="author" content="ShinDarth">
+
+  <title>WoW-Mania PvPstats</title>
+
+  <link href="css/bootstrap-cyborg.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="js/ie10-viewport-bug-workaround.js"></script>
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+
+  <div class="text-center">
+    <a style="margin: 2px 20px;" href="battleground.php?id=5559"><button id="search" type="submit"
+        class="btn btn-default">&larr; Prev</button></a>
+    <a style="margin: 2px 20px;" href="battleground.php"><button id="search" type="submit"
+        class="btn btn-default">Back</button></a>
+    <a style="margin: 2px 20px;" href="battleground.php?id=5561"><button id="search" type="submit"
+        class="btn btn-default">Next &rarr;</button></a>
+  </div>
+
+  <div class="container">
+
+    <div class="main-title"></div>
+
+
+    <div class="row">
+      <div class="col-xs-4">
+        <p class="lead text-left"><span style="color: yellow">[80]</span> <span style="color: white">Warsong
+            Gulch</span></p>
+      </div>
+      <div class="col-xs-4">
+        <p class="lead text-center"><span style="color: #cd0a0e">Horde Wins</span></p>
+      </div>
+      <div class="col-xs-4">
+        <p class="lead text-right" style="color: white">2018-01-07 <span style="color: pink">[00:11:47]</span></p>
+      </div>
+    </div>
+
+    <div id="bg-table-container" class="table-responsive">
+      <table id="bg-table" class="table table-hover text-center" data-sortable>
+        <thead>
+          <tr>
+            <th id="character" class="th-elem text-center" onClick="thfocus(this)">Character</th>
+            <th id="class" class="th-elem text-center" onClick="thfocus(this)">&#9679;</th>
+
+            <th id="killing-blows" class="th-elem text-center" onClick="thfocus(this)">Killing Blows</th>
+            <th id="deaths" class="th-elem text-center" onClick="thfocus(this)">Deaths</th>
+            <th id="honorable-kills" class="th-elem text-center" onClick="thfocus(this)">Honorable Kills</th>
+            <th id="bonus-honor" class="th-elem text-center" onClick="thfocus(this)">Bonus Honor</th>
+            <th id="damage-done" class="th-elem text-center" onClick="thfocus(this)">Damage Done</th>
+            <th id="healing" class="th-elem text-center" onClick="thfocus(this)">Healing Done</th>
+
+            <th id="attr1" class="th-elem text-center" onClick="thfocus(this)">Flags Captured</th>
+            <th id="attr2" class="th-elem text-center" onClick="thfocus(this)">Flags Returned</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Scarlat</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                src="img/race/10-0.gif"></td>
+            <td>23</td>
+            <td>2</td>
+            <td>57</td>
+            <td>2617</td>
+            <td>640260</td>
+            <td>50972</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>14</td>
+            <td>1</td>
+            <td>48</td>
+            <td>2204</td>
+            <td>397776</td>
+            <td>76446</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>13</td>
+            <td>0</td>
+            <td>45</td>
+            <td>2211</td>
+            <td>381244</td>
+            <td>62432</td>
+            <td>0</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Fen</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                src="img/race/10-0.gif"></td>
+            <td>13</td>
+            <td>3</td>
+            <td>42</td>
+            <td>2666</td>
+            <td>570865</td>
+            <td>15862</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Sinner</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/8.gif"> <img
+                src="img/race/8-0.gif"></td>
+            <td>11</td>
+            <td>4</td>
+            <td>33</td>
+            <td>1884</td>
+            <td>331074</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Soulie</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                src="img/race/2-0.gif"></td>
+            <td>6</td>
+            <td>2</td>
+            <td>40</td>
+            <td>2052</td>
+            <td>226188</td>
+            <td>43826</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #1a67f4; "><strong>Moonkeeper</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                src="img/race/4-1.gif"></td>
+            <td>6</td>
+            <td>6</td>
+            <td>14</td>
+            <td>690</td>
+            <td>236667</td>
+            <td>28292</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>5</td>
+            <td>8</td>
+            <td>8</td>
+            <td>561</td>
+            <td>280707</td>
+            <td>904</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>2</td>
+            <td>13</td>
+            <td>10</td>
+            <td>477</td>
+            <td>98788</td>
+            <td>53054</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #1a67f4; "><strong>Bluejay</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                src="img/race/4-1.gif"></td>
+            <td>2</td>
+            <td>11</td>
+            <td>10</td>
+            <td>492</td>
+            <td>226816</td>
+            <td>833</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #1a67f4; "><strong>Papadack</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/4.gif"> <img
+                src="img/race/1-0.gif"></td>
+            <td>1</td>
+            <td>5</td>
+            <td>8</td>
+            <td>494</td>
+            <td>108302</td>
+            <td>5578</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>1</td>
+            <td>9</td>
+            <td>8</td>
+            <td>446</td>
+            <td>7599</td>
+            <td>171648</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #1a67f4; "><strong>Arkaniss</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/8.gif"> <img
+                src="img/race/1-0.gif"></td>
+            <td>1</td>
+            <td>4</td>
+            <td>6</td>
+            <td>384</td>
+            <td>114058</td>
+            <td>1190</td>
+            <td>0</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Bloodsoul</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                src="img/race/5-0.gif"></td>
+            <td>1</td>
+            <td>5</td>
+            <td>28</td>
+            <td>1654</td>
+            <td>37149</td>
+            <td>11454</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>1</td>
+            <td>3</td>
+            <td>2</td>
+            <td>279</td>
+            <td>45520</td>
+            <td>14612</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: ; "><strong></strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/0.gif"> <img
+                src="img/race/0-0.gif"></td>
+            <td>1</td>
+            <td>8</td>
+            <td>9</td>
+            <td>446</td>
+            <td>211046</td>
+            <td>90790</td>
+            <td>0</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Currara</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                src="img/race/10-1.gif"></td>
+            <td>1</td>
+            <td>1</td>
+            <td>19</td>
+            <td>1609</td>
+            <td>14512</td>
+            <td>248511</td>
+            <td>3</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #1a67f4; "><strong>Ellalala</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/5.gif"> <img
+                src="img/race/1-1.gif"></td>
+            <td>0</td>
+            <td>0</td>
+            <td>41</td>
+            <td>2092</td>
+            <td>33867</td>
+            <td>211315</td>
+            <td>0</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td><span style="color: #cd0a0e; "><strong>Ssxeiroline</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                src="img/race/10-0.gif"></td>
+            <td>0</td>
+            <td>2</td>
+            <td>44</td>
+            <td>2198</td>
+            <td>36964</td>
+            <td>386477</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td><span style="color: #1a67f4; "><strong>Blademasters</strong></a></td>
+            <td style="min-width: 49px; padding-left: 0; padding-right: 0;"><img src="img/class/1.gif"> <img
+                src="img/race/4-0.gif"></td>
+            <td>0</td>
+            <td>9</td>
+            <td>2</td>
+            <td>334</td>
+            <td>57285</td>
+            <td>4799</td>
+            <td>0</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <br>
+
+    <div class="row text-center">
+      <div class="col-lg-3 col-sm-6" style="padding: 0 10px;">
+        <p class="h4">Guild Members</p>
+        <div class="score-faction-container">
+          Amount of members joined this BG
+        </div>
+        <div class="guild-members-container score-container" style="border: 1px solid grey">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Guild</th>
+                <th class="text-center">Members</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span style="color: #cd0a0e; "><strong>WellasOnFire</strong></a></td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #cd0a0e; "><strong>PVP</strong></a></td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #1a67f4; "><strong>Just Crit It</strong></a></td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #1a67f4; "><strong>Di Selecti</strong></a></td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #cd0a0e; "><strong>Kebab Takeaway</strong></a></td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #cd0a0e; "><strong>Coconut Crazy Pirates</strong></a></td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #1a67f4; "><strong>Adversity</strong></a></td>
+                <td>1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button id="toggle-guild-members" type="button" class="btn btn-default btn-xs">More</button>
+      </div>
+      <div class="col-lg-3 col-sm-6" style="padding: 0 10px;">
+        <p class="h4">2018-01-07 <span style="color: yellow">[80]</span></p>
+        <div class="score-faction-container">
+          <img src="img/alliance_min.png" height="100%"> <span
+            style="color: white; font-size: 20px;"><strong>&nbsp;&nbsp;11&nbsp;&nbsp;
+              -&nbsp;&nbsp;12&nbsp;&nbsp;</strong></span> <img src="img/horde_min.png" height="100%">
+        </div>
+        <div class="this-day-score-container score-container">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Character</th>
+                <th class="text-center">&#9679;</th>
+                <th class="text-center">Victories</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span style="color: #cd0a0e; "><strong>Scarlat</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>11</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #1a67f4; "><strong>Alockcritler</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/1-0.gif"></td>
+                <td>9</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span style="color: #cd0a0e; "><strong>Ssxeiroline</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span style="color: #1a67f4; "><strong>Ellalala</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/5.gif"> <img
+                    src="img/race/1-1.gif"></td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><span style="color: #cd0a0e; "><strong>Kanasta</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                    src="img/race/10-1.gif"></td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span style="color: #cd0a0e; "><strong>Currara</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/10-1.gif"></td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span style="color: #1a67f4; "><strong>Justicara</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/1-1.gif"></td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span style="color: #1a67f4; "><strong>Headliner</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/11.gif"> <img
+                    src="img/race/4-1.gif"></td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span style="color: #1a67f4; "><strong>Stinkypete</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/4.gif"> <img
+                    src="img/race/7-0.gif"></td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><span style="color: #cd0a0e; "><strong>Batz</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/7.gif"> <img
+                    src="img/race/6-0.gif"></td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><span style="color: #cd0a0e; "><strong>Stejarel</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #1a67f4; "><strong>Anemiss</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/1.gif"> <img
+                    src="img/race/4-0.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #cd0a0e; "><strong>Killtolive</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/10-1.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #cd0a0e; "><strong>Soulie</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/2-0.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #cd0a0e; "><strong>Fen</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #1a67f4; "><strong>Kyo</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/1-0.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #cd0a0e; "><strong>Necrosiss</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/5-0.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #cd0a0e; "><strong>Unstoppable</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/11.gif"> <img
+                    src="img/race/6-0.gif"></td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><span style="color: #1a67f4; "><strong>Envenomssg</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/4.gif"> <img
+                    src="img/race/1-0.gif"></td>
+                <td>3</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><span style="color: #1a67f4; "><strong>Alilad</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/1-1.gif"></td>
+                <td>3</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button id="toggle-this-day" type="button" class="btn btn-default btn-xs">More</button>
+      </div>
+      <div class="col-lg-3 col-sm-6" style="padding: 0 10px;">
+        <p class="h4">Jan 2018 <span style="color: yellow">[80]</span></p>
+        <div class="score-faction-container">
+          <img src="img/alliance_min.png" height="100%"> <span
+            style="color: white; font-size: 20px;"><strong>&nbsp;&nbsp;187&nbsp;&nbsp;
+              -&nbsp;&nbsp;249&nbsp;&nbsp;</strong></span> <img src="img/horde_min.png" height="100%">
+        </div>
+        <div class="this-month-score-container score-container">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Character</th>
+                <th class="text-center">&#9679;</th>
+                <th class="text-center">Victories</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span style="color: #cd0a0e; "><strong>Scarlat</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>113</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span style="color: #cd0a0e; "><strong>Sttyler</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/8.gif"> <img
+                    src="img/race/8-0.gif"></td>
+                <td>94</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span style="color: #1a67f4; "><strong>Alockcritler</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/1-0.gif"></td>
+                <td>90</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><span style="color: #1a67f4; "><strong>Justicara</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/1-1.gif"></td>
+                <td>89</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span style="color: #1a67f4; "><strong>Stinkypete</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/4.gif"> <img
+                    src="img/race/7-0.gif"></td>
+                <td>79</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><span style="color: #1a67f4; "><strong>Ellalala</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/5.gif"> <img
+                    src="img/race/1-1.gif"></td>
+                <td>75</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span style="color: #cd0a0e; "><strong>Necrosiss</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/5-0.gif"></td>
+                <td>74</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><span style="color: #cd0a0e; "><strong>Kanasta</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                    src="img/race/10-1.gif"></td>
+                <td>73</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><span style="color: #1a67f4; "><strong>Headliner</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/11.gif"> <img
+                    src="img/race/4-1.gif"></td>
+                <td>73</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td><span style="color: #cd0a0e; "><strong>Ssxeiroline</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>71</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td><span style="color: #cd0a0e; "><strong>Meklo</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/4.gif"> <img
+                    src="img/race/9-0.gif"></td>
+                <td>69</td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td><span style="color: #cd0a0e; "><strong>Avah</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/9.gif"> <img
+                    src="img/race/10-1.gif"></td>
+                <td>62</td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td><span style="color: #cd0a0e; "><strong>Fen</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/3.gif"> <img
+                    src="img/race/10-0.gif"></td>
+                <td>59</td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td><span style="color: #1a67f4; "><strong>Anemiss</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/1.gif"> <img
+                    src="img/race/4-0.gif"></td>
+                <td>49</td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td><span style="color: #1a67f4; "><strong>Kamikazee</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/11-0.gif"></td>
+                <td>47</td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td><span style="color: #1a67f4; "><strong>Bizancio</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/1-1.gif"></td>
+                <td>47</td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td><span style="color: #1a67f4; "><strong>Sigurd</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/1-0.gif"></td>
+                <td>46</td>
+              </tr>
+              <tr>
+                <td>16</td>
+                <td><span style="color: #1a67f4; "><strong>Magikill</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/8.gif"> <img
+                    src="img/race/7-0.gif"></td>
+                <td>44</td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td><span style="color: #1a67f4; "><strong>Divineangel</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/2.gif"> <img
+                    src="img/race/11-1.gif"></td>
+                <td>42</td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td><span style="color: #cd0a0e; "><strong>Muundancer</strong></a></td>
+                <td style="min-width: 46px; padding-left: 0; padding-right: 0;"><img src="img/class/11.gif"> <img
+                    src="img/race/6-0.gif"></td>
+                <td>42</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button id="toggle-this-month" type="button" class="btn btn-default btn-xs">More</button>
+      </div>
+      <div class="col-lg-3 col-sm-6" style="padding: 0 10px;">
+        <p class="h4">BattleGrounds of the day</p>
+        <div class="score-faction-container">
+          All BattleGrounds played 2018-01-07 </div>
+        <div class="bg-day-container score-container" style="border: 1px solid grey">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Type</th>
+                <th class="text-center">&#9679;</th>
+                <th class="text-center">End time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5582'">
+                <td>5582</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>23:47:09</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5581'">
+                <td>5581</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>23:08:18</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5580'">
+                <td>5580</td>
+                <td>AV</td>
+                <td>80</td>
+                <td>22:56:40</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5579'">
+                <td>5579</td>
+                <td>AV</td>
+                <td>80</td>
+                <td>22:47:55</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5578'">
+                <td>5578</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>21:06:46</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5577'">
+                <td>5577</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>20:52:04</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5576'">
+                <td>5576</td>
+                <td>EotS</td>
+                <td>80</td>
+                <td>20:24:44</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5575'">
+                <td>5575</td>
+                <td>EotS</td>
+                <td>80</td>
+                <td>19:56:54</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5574'">
+                <td>5574</td>
+                <td>AV</td>
+                <td>80</td>
+                <td>19:48:22</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5573'">
+                <td>5573</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>19:39:42</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5572'">
+                <td>5572</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>19:30:15</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5571'">
+                <td>5571</td>
+                <td>AV</td>
+                <td>80</td>
+                <td>19:14:52</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5570'">
+                <td>5570</td>
+                <td>IoC</td>
+                <td>80</td>
+                <td>18:49:36</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5569'">
+                <td>5569</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>18:21:23</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5568'">
+                <td>5568</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>17:45:27</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5567'">
+                <td>5567</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>16:19:22</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5566'">
+                <td>5566</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>02:40:27</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5565'">
+                <td>5565</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>02:27:47</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5564'">
+                <td>5564</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>01:59:39</td>
+              </tr></a>
+              <tr style="color: #1a67f4; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5563'">
+                <td>5563</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>01:39:58</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5562'">
+                <td>5562</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>00:27:58</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5561'">
+                <td>5561</td>
+                <td>AB</td>
+                <td>80</td>
+                <td>00:21:08</td>
+              </tr></a>
+              <tr style="color: #cd0a0e; font-weight: bold;" class="hover-pointer"
+                onClick="location.href='battleground.php?id=5560'">
+                <td>5560</td>
+                <td>WG</td>
+                <td>80</td>
+                <td>00:11:47</td>
+              </tr></a>
+            </tbody>
+          </table>
+        </div>
+        <button id="toggle-bg-day" type="button" class="btn btn-default btn-xs">More</button>
+      </div>
+    </div>
+
+
+
+    <div id="footer">
+      <hr>
+      <p class="h5 text-center">&#9679;&nbsp;<a target="_blank"
+          href="https://github.com/ShinDarth/PvPstats"><strong>PvPstats</strong></a> for <a target="_blank"
+          href="http://wow-mania.com/">WoW-Mania</a> is free software coded by <a target="_blank"
+          href="http://shinworld.altervista.org/"><strong>ShinDarth</strong></a>&nbsp;&#9679;</p>
+      <p class="text-center" style="margin-top: 20px"><iframe
+          src="https://ghbtns.com/github-btn.html?user=ShinDarth&repo=PvPstats&type=watch&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>&nbsp;<iframe
+          src="https://ghbtns.com/github-btn.html?user=ShinDarth&repo=PvPstats&type=fork&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>&nbsp;<iframe
+          src="https://ghbtns.com/github-btn.html?user=ShinDarth&type=follow&count=true" allowtransparency="true"
+          frameborder="0" scrolling="0" width="165" height="20"></iframe></p>
+    </div>
+
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/sortable.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+
+      $('#killing-blows').click();
+
+      var winner_faction = 0;
+      var alliance = "blue";
+      var horde = "red";
+      var none = "grey";
+
+      switch (winner_faction) {
+        case 1:
+          $('#bg-table-container').css("border", "1px solid " + alliance);
+          break;
+        case 0:
+          $('#bg-table-container').css("border", "1px solid " + horde);
+          break;
+        case 2:
+          $('#bg-table-container').css("border", "1px solid " + none);
+          break;
+      }
+
+
+      if (11 > 12) {
+        $('.this-day-score-container').css("border", "1px solid " + alliance);
+      }
+      else if (11 < 12) {
+        $('.this-day-score-container').css("border", "1px solid " + horde);
+      }
+      else {
+        $('.this-day-score-container').css("border", "1px solid " + none);
+      }
+
+      if (187 > 249) {
+        $('.this-month-score-container').css("border", "1px solid " + alliance);
+      }
+      else if (187 < 249) {
+        $('.this-month-score-container').css("border", "1px solid " + horde);
+      }
+      else {
+        $('.this-month-score-container').css("border", "1px solid " + none);
+      }
+
+      $('#toggle-guild-members').click(function () {
+        if ($('#toggle-guild-members').html() == "More") {
+          $('.guild-members-container').css("max-height", "798px");
+          $('#toggle-guild-members').html("Less");
+        }
+        else {
+          $('.guild-members-container').css("max-height", "417px");
+          $('#toggle-guild-members').html("More");
+        }
+      });
+
+      $('#toggle-this-day').click(function () {
+        if ($('#toggle-this-day').html() == "More") {
+          $('.this-day-score-container').css("max-height", "798px");
+          $('#toggle-this-day').html("Less");
+        }
+        else {
+          $('.this-day-score-container').css("max-height", "417px");
+          $('#toggle-this-day').html("More");
+        }
+      });
+
+      $('#toggle-this-month').click(function () {
+        if ($('#toggle-this-month').html() == "More") {
+          $('.this-month-score-container').css("max-height", "798px");
+          $('#toggle-this-month').html("Less");
+        }
+        else {
+          $('.this-month-score-container').css("max-height", "417px");
+          $('#toggle-this-month').html("More");
+        }
+      });
+
+      $('#toggle-bg-day').click(function () {
+        if ($('#toggle-bg-day').html() == "More") {
+          $('.bg-day-container').css("max-height", "798px");
+          $('#toggle-bg-day').html("Less");
+        }
+        else {
+          $('.bg-day-container').css("max-height", "417px");
+          $('#toggle-bg-day').html("More");
+        }
+      });
+
+
+    });
+
+    function thfocus(element) {
+      $('.th-elem').each(function () {
+        $(this).css("color", "#FFF");
+      });
+
+      $(element).css("color", "yellow");
+    }
+  </script>
+
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516"
+    integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg=="
+    data-cf-beacon='{"version":"2024.11.0","token":"69d50ff9a58046baacfeb16614f65238","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

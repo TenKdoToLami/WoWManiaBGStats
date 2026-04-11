@@ -1,0 +1,23 @@
+# Database Temporary Files
+data/pvpstats.db-shm
+data/pvpstats.db-wal
+data/*.db-journal
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+
+# IDES
+.vscode/
+.idea/
+
+# AI Tooling
+.gemini/
