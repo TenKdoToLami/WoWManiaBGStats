@@ -19,6 +19,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const $ = id => document.getElementById(id);
     let db = null;
 
+    // ===================================
+    // State Management
+    // ===================================
+    const lbState = {
+        minMatches: 50,
+        mode: 'avg', // 'avg' or 'total'
+        boards: {
+            active:  { offset: 0, limit: 15, exhausted: false },
+            damage:  { offset: 0, limit: 15, exhausted: false },
+            healing: { offset: 0, limit: 15, exhausted: false },
+            kb:      { offset: 0, limit: 15, exhausted: false },
+            hk:      { offset: 0, limit: 15, exhausted: false }
+        }
+    };
+
     // Track active Chart instances for cleanup
     const activeCharts = {};
     function destroyChart(key) {
@@ -75,12 +90,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dataPromise = fetch("data/pvpstats.db").then(res => res.arrayBuffer());
 
         const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
+        
+        const loaderSub = document.querySelector('.loader-subtext');
+        if (loaderSub) loaderSub.innerText = "Parsing database into memory...";
+        
         db = new SQL.Database(new Uint8Array(buf));
 
+        // Initial rendering
+        if (loaderSub) loaderSub.innerText = "Rendering analytics & leaderboards...";
         renderOverview(db);
-        initLeaderboardListeners(db); // Set up filter and load-more listeners
-        renderAllLeaderboards(db);    // Initial render
+        initLeaderboardListeners(db); 
+        renderAllLeaderboards(db);    
         renderRecentMatches(db);
+
+        // Finalize
+        if (loaderSub) loaderSub.innerText = "Dashboard Ready!";
+        
+        setTimeout(() => {
+            const overlay = document.getElementById('loading-overlay');
+            const container = document.querySelector('.container');
+            
+            if (overlay) overlay.classList.add('hidden');
+            if (container) container.classList.add('loaded');
+        }, 600);
 
         // If misc tab is active at load, init it now
         if (hashTab === 'misc') {
@@ -91,6 +123,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error("Failed to load or parse database:", err);
         $('total-matches').innerText = "Error loading DB";
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.classList.add('hidden');
     }
 
     // ===================================
@@ -529,18 +563,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ===================================
     // 6. Leaderboards (Endless & Filtered)
     // ===================================
-    const lbState = {
-        minMatches: 50,
-        mode: 'avg', // 'avg' or 'total'
-        boards: {
-            active: { offset: 0, limit: 15, exhausted: false },
-            damage: { offset: 0, limit: 15, exhausted: false },
-            healing: { offset: 0, limit: 15, exhausted: false },
-            kb: { offset: 0, limit: 15, exhausted: false },
-            hk: { offset: 0, limit: 15, exhausted: false }
-        }
-    };
-
     function initLeaderboardListeners(db) {
         // Mode filter pills (Avg vs Total)
         document.querySelectorAll('#mode-pills .filter-pill').forEach(pill => {

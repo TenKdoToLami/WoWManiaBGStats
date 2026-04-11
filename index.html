@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WoW-Mania BG Analytics</title>
-    <meta name="description" content="Comprehensive PvP battleground analytics for WoW-Mania — tracking 27,000+ matches and 380,000+ player records from 2015 to 2026.">
+    <meta name="description"
+        content="Comprehensive PvP battleground analytics for WoW-Mania — tracking 27,000+ matches and 380,000+ player records from 2015 to 2026.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
 </head>
+
 <body>
     <div class="background-glow"></div>
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loader-text">Loading WoW-Mania Statistics...</div>
+            <div class="loader-subtext">Fetching battleground database</div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1><span class="highlight">WoW-Mania</span> Battleground Analytics</h1>
-            <p>Data scraped directly from WoW-Mania PvP rankings. Tracking <span id="total-matches">...</span> matches and <span id="total-players">...</span> unique characters.</p>
+            <p>Data scraped directly from WoW-Mania PvP rankings. Tracking <span id="total-matches">...</span> matches
+                and <span id="total-players">...</span> unique characters.</p>
         </header>
 
         <!-- Tab Navigation -->
@@ -42,8 +55,12 @@
             <!-- Search Bar -->
             <div class="search-section">
                 <div class="search-wrapper">
-                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input type="text" id="player-search" class="search-input" placeholder="Search player by name..." autocomplete="off">
+                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="text" id="player-search" class="search-input" placeholder="Search player by name..."
+                        autocomplete="off">
                     <div class="search-results" id="player-search-results"></div>
                 </div>
             </div>
@@ -89,7 +106,16 @@
                             <h3>📊 Recent Match History</h3>
                             <div class="leaderboard-table-wrap" style="max-height: 340px;">
                                 <table class="leaderboard-table" id="player-match-history">
-                                    <thead><tr><th>Date</th><th>BG</th><th>Result</th><th>Dmg</th><th>Heal</th><th>KB</th></tr></thead>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>BG</th>
+                                            <th>Result</th>
+                                            <th>Dmg</th>
+                                            <th>Heal</th>
+                                            <th>KB</th>
+                                        </tr>
+                                    </thead>
                                     <tbody></tbody>
                                 </table>
                             </div>
@@ -133,7 +159,13 @@
                         </h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-active">
-                                <thead><tr><th>#</th><th>Player</th><th>Matches</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Matches</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -145,7 +177,13 @@
                         </h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-damage">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg Damage</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg Damage</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -157,7 +195,13 @@
                         </h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-healing">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg Healing</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg Healing</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -169,7 +213,13 @@
                         </h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-kb">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg KB</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg KB</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -181,7 +231,13 @@
                         </h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-hk">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg HK</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg HK</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -198,8 +254,12 @@
             <!-- Search Bar -->
             <div class="search-section">
                 <div class="search-wrapper search-wrapper-compact">
-                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input type="number" id="match-search" class="search-input" placeholder="Search match by ID..." autocomplete="off">
+                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <input type="number" id="match-search" class="search-input" placeholder="Search match by ID..."
+                        autocomplete="off">
                     <button class="search-btn" id="match-search-btn">Lookup</button>
                 </div>
             </div>
@@ -273,7 +333,9 @@
                                 <span class="label">Wins</span>
                             </div>
                         </div>
-                        <div class="vs"><h2>VS</h2></div>
+                        <div class="vs">
+                            <h2>VS</h2>
+                        </div>
                         <div class="faction alliance">
                             <div class="faction-data right">
                                 <h3>Alliance</h3>
@@ -331,7 +393,7 @@
                         <canvas id="classChart"></canvas>
                     </div>
                 </div>
-                
+
                 <!-- Avg Damage & Healing per Class -->
                 <div class="card chart-card full-width">
                     <h2>⚔️ Average Damage & Healing per Class</h2>
@@ -361,11 +423,13 @@
         </div>
 
         <footer>
-            <p>Data sourced from <a href="https://wow-mania.org" target="_blank" rel="noopener">wow-mania.org</a> PvP statistics. Dashboard built with Chart.js & sql.js.</p>
+            <p>Data sourced from <a href="https://wow-mania.org" target="_blank" rel="noopener">wow-mania.org</a> PvP
+                statistics. Dashboard built with Chart.js & sql.js.</p>
         </footer>
     </div>
-    
+
     <script src="js/icons.js"></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>
