@@ -188,11 +188,10 @@ const WoWIcons = (() => {
         return bgShortNames[fullName] || fullName;
     }
 
-    /** Format large numbers with K/M suffix */
+    /** Format numbers with full precision and commas */
     function formatNumber(n) {
-        if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-        if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
-        return n.toLocaleString();
+        if (n === null || n === undefined) return '0';
+        return Number(n).toLocaleString();
     }
 
     /** Format seconds to mm:ss or hh:mm:ss */

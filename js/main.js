@@ -255,6 +255,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         $('player-profile').classList.add('hidden');
     });
 
+    function formatDuration(seconds) {
+        if (!seconds) return '0s';
+        const d = Math.floor(seconds / (3600 * 24));
+        const h = Math.floor((seconds % (3600 * 24)) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        
+        let res = [];
+        if (d > 0) res.push(`${d}d`);
+        if (h > 0) res.push(`${h}h`);
+        if (m > 0) res.push(`${m}m`);
+        if (s > 0 && res.length < 3) res.push(`${s}s`);
+        return res.join(' ') || '0s';
+    }
+
     function loadPlayerProfile(charId) {
         if (!db) return;
         try {
@@ -263,20 +278,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (nameRes.length === 0) return;
             const playerName = nameRes[0].values[0][0];
 
-            // Get aggregate stats
+            // Get comprehensive aggregate stats
             const statsRes = db.exec(`
                 SELECT 
                     COUNT(DISTINCT ps.match_id) as total_matches,
                     SUM(CASE WHEN ps.faction_id = m.winner_id THEN 1 ELSE 0 END) as wins,
-                    CAST(AVG(ps.damage) AS INTEGER) as avg_damage,
-                    CAST(AVG(ps.healing) AS INTEGER) as avg_healing,
-                    CAST(AVG(ps.kb) AS INTEGER) as avg_kb,
-                    CAST(AVG(ps.deaths) AS INTEGER) as avg_deaths,
                     SUM(ps.kb) as total_kb,
-                    SUM(ps.deaths) as total_deaths,
                     SUM(ps.hk) as total_hk,
+                    SUM(ps.deaths) as total_deaths,
                     SUM(ps.damage) as total_damage,
-                    SUM(ps.healing) as total_healing
+                    SUM(ps.healing) as total_healing,
+                    SUM(ps.bonus_honor) as total_honor,
+                    SUM(m.duration_seconds) as total_time
                 FROM player_stats ps
                 JOIN matches m ON ps.match_id = m.id
                 WHERE ps.character_id = ${charId}
@@ -284,9 +297,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (statsRes.length === 0) return;
             const s = statsRes[0].values[0];
-            const [totalMatches, wins, avgDmg, avgHeal, avgKb, avgDeaths, totalKb, totalDeaths, totalHk, totalDmg, totalHeal] = s;
+            const [totalMatches, wins, totalKb, totalHk, totalDeaths, totalDmg, totalHeal, totalHonor, rawTime] = s;
+            
+            // FIX: Duration is stored in 60ths of a second (server ticks) or similar
+            const totalTime = rawTime / 60;
             const losses = totalMatches - wins;
             const winRate = totalMatches > 0 ? ((wins / totalMatches) * 100).toFixed(1) : 0;
+            const wlRatio = losses > 0 ? (wins / losses).toFixed(2) : wins.toFixed(2);
             const kd = totalDeaths > 0 ? (totalKb / totalDeaths).toFixed(2) : totalKb.toFixed(2);
 
             // Get most played class
@@ -315,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `);
             const mainFaction = facRes.length > 0 ? facRes[0].values[0][0] : 0;
 
-            // Render profile header
+            // 1. Render Header
             $('profile-icons').innerHTML = `
                 ${Icons.factionIcon(mainFaction, 40)}
                 ${Icons.classIcon(mainClassId, 40)}
@@ -325,8 +342,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             $('profile-name').style.color = Icons.getClassColor(mainClassId);
             $('profile-subtitle').textContent = `${Icons.getClassName(mainClassId)} · ${Icons.raceCodeToName(mainRaceCode)} · ${Icons.getFactionName(mainFaction)}`;
 
-            // Render stat cards
-            $('profile-stats-grid').innerHTML = `
+            // 2. Render Overall Stats Header (Cards)
+            $('profile-stats-header').innerHTML = `
                 <div class="profile-stat">
                     <div class="profile-stat-value">${totalMatches.toLocaleString()}</div>
                     <div class="profile-stat-label">Matches</div>
@@ -343,37 +360,93 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="profile-stat-value">${kd}</div>
                     <div class="profile-stat-label">K/D Ratio</div>
                 </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">${Icons.formatNumber(avgDmg)}</div>
-                    <div class="profile-stat-label">Avg Damage</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">${Icons.formatNumber(avgHeal)}</div>
-                    <div class="profile-stat-label">Avg Healing</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">${avgKb}</div>
-                    <div class="profile-stat-label">Avg KB</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">${Icons.formatNumber(totalHk)}</div>
-                    <div class="profile-stat-label">Total HK</div>
-                </div>
             `;
+
+            // 3. Render Unified Detailed Stats Table
+            const rows = [
+                { label: 'Time in Battlegrounds', t: formatDuration(totalTime), a: formatDuration(totalTime / totalMatches) },
+                { label: 'Honorable Kills', t: Icons.formatNumber(totalHk), a: (totalHk / totalMatches).toFixed(1) },
+                { label: 'Killing Blows', t: Icons.formatNumber(totalKb), a: (totalKb / totalMatches).toFixed(1) },
+                { label: 'Deaths', t: Icons.formatNumber(totalDeaths), a: (totalDeaths / totalMatches).toFixed(1) },
+                { label: 'Bonus Honor', t: Icons.formatNumber(totalHonor), a: Math.floor(totalHonor / totalMatches).toLocaleString() },
+                { label: 'Damage', t: Icons.formatNumber(totalDmg), a: Icons.formatNumber(Math.floor(totalDmg / totalMatches)) },
+                { label: 'Healing', t: Icons.formatNumber(totalHeal), a: Icons.formatNumber(Math.floor(totalHeal / totalMatches)) }
+            ];
+
+            $('player-detailed-stats').querySelector('tbody').innerHTML = rows.map(r => `
+                <tr>
+                    <td class="label">${r.label}</td>
+                    <td class="value">${r.t}</td>
+                    <td class="value">${r.a}</td>
+                </tr>
+            `).join('');
 
             // Show profile
             $('player-profile').classList.remove('hidden');
             $('player-profile').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-            // Render profile charts
+            // 4. Render Charts & Breakdowns
             renderPlayerActivityChart(charId);
             renderPlayerBgChart(charId);
-            renderPlayerClassChart(charId);
+            renderPlayerBreakdown(charId, 'map', 'player-map-list');
+            renderPlayerBreakdown(charId, 'bracket', 'player-bracket-list');
             renderPlayerMatchHistory(charId);
 
         } catch (e) {
             console.error("Player profile error:", e);
         }
+    }
+
+    function renderPlayerBreakdown(charId, type, containerId) {
+        const container = $(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        
+        try {
+            let query = '';
+            if (type === 'map') {
+                query = `
+                    SELECT bg.name, COUNT(*) as cnt
+                    FROM player_stats ps
+                    JOIN matches m ON ps.match_id = m.id
+                    JOIN bg_map bg ON m.bg_id = bg.id
+                    WHERE ps.character_id = ${charId}
+                    GROUP BY m.bg_id ORDER BY cnt DESC
+                `;
+            } else {
+                query = `
+                    SELECT br.name, COUNT(*) as cnt
+                    FROM player_stats ps
+                    JOIN matches m ON ps.match_id = m.id
+                    JOIN bracket_map br ON m.bracket_id = br.id
+                    WHERE ps.character_id = ${charId}
+                    GROUP BY m.bracket_id ORDER BY cnt DESC
+                `;
+            }
+
+            const res = db.exec(query);
+            if (res.length === 0) return;
+
+            const rows = res[0].values;
+            const max = Math.max(...rows.map(r => r[1]));
+
+            container.innerHTML = rows.map(r => {
+                const name = r[0];
+                const count = r[1];
+                const pct = (count / max) * 100;
+                return `
+                    <div class="detail-item">
+                        <div class="detail-item-header">
+                            <span>${name === '80' ? 'Level 80' : name}</span>
+                            <span>${count} matches</span>
+                        </div>
+                        <div class="detail-item-bar-bg">
+                            <div class="detail-item-bar-fill" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) { console.error(`Breakdown error (${type}):`, e); }
     }
 
     function renderPlayerActivityChart(charId) {
@@ -485,41 +558,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.error("Player BG chart error:", e); }
     }
 
-    function renderPlayerClassChart(charId) {
-        destroyChart('playerClass');
-        try {
-            const res = db.exec(`
-                SELECT class_id, COUNT(*) as cnt
-                FROM player_stats
-                WHERE character_id = ${charId} AND class_id > 0
-                GROUP BY class_id ORDER BY cnt DESC
-            `);
-            if (res.length === 0) return;
-
-            const values = res[0].values;
-            const labels = values.map(d => Icons.getClassName(d[0]));
-            const data = values.map(d => d[1]);
-            const colors = values.map(d => Icons.getClassColor(d[0]));
-
-            const ctx = $('playerClassChart').getContext('2d');
-            activeCharts.playerClass = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data, backgroundColor: colors, borderWidth: 0, hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } },
-                    cutout: '60%'
-                }
-            });
-        } catch (e) { console.error("Player class chart error:", e); }
-    }
-
     function renderPlayerMatchHistory(charId) {
         try {
             const res = db.exec(`
@@ -531,7 +569,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 JOIN bg_map bg ON m.bg_id = bg.id
                 WHERE ps.character_id = ${charId}
                 ORDER BY m.id DESC
-                LIMIT 50
             `);
             if (res.length === 0) return;
 

@@ -78,9 +78,30 @@
                         </div>
                         <button class="profile-close" id="profile-close" title="Close profile">&times;</button>
                     </div>
-                    <div class="profile-stats-grid" id="profile-stats-grid">
-                        <!-- Stat cards injected here -->
+                    <div class="profile-stats-grid" id="profile-stats-header">
+                        <!-- Injected: Matches, Win Rate, Record, KD -->
                     </div>
+
+                    <div class="profile-main-grid">
+                        <div class="profile-stats-container">
+                            <div class="profile-table-card">
+                                <h4 class="table-title">Performance Breakdown</h4>
+                                <table class="profile-data-table" id="player-detailed-stats">
+                                    <thead>
+                                        <tr>
+                                            <th class="label">Metric</th>
+                                            <th class="value">Total</th>
+                                            <th class="value">Average</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Injected: Merged Stats -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="profile-charts-grid">
                         <div class="card chart-card">
                             <h3>📈 Activity Over Time</h3>
@@ -95,14 +116,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="profile-charts-grid">
-                        <div class="card chart-card">
-                            <h3>⚔️ Class Distribution</h3>
-                            <div class="chart-container chart-sm">
-                                <canvas id="playerClassChart"></canvas>
+
+                    <div class="profile-details-grid">
+                        <div class="profile-detail-panel">
+                            <h3>🗺️ Played by Map</h3>
+                            <div class="detail-list" id="player-map-list">
+                                <!-- Injected -->
                             </div>
                         </div>
-                        <div class="card chart-card">
+                        <div class="profile-detail-panel">
+                            <h3>🎖️ Played by Level Bracket</h3>
+                            <div class="detail-list" id="player-bracket-list">
+                                <!-- Injected -->
+                            </div>
+                        </div>
+                        <div class="profile-detail-panel full-width">
                             <h3>📊 Recent Match History</h3>
                             <div class="leaderboard-table-wrap" style="max-height: 340px;">
                                 <table class="leaderboard-table" id="player-match-history">

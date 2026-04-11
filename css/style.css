@@ -543,124 +543,265 @@ input[type="number"] {
 }
 
 /* ==================== */
-/* Player Profile       */
+/* 5. Player Profile    */
 /* ==================== */
-
 .player-profile-section {
     margin-bottom: 2rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
 .profile-card {
+    padding: 2.5rem;
+    background: rgba(15, 23, 42, 0.4);
     border: 1px solid rgba(99, 102, 241, 0.2);
     box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px rgba(99,102,241,0.08);
-}
-
-.profile-card:hover {
-    transform: none;
 }
 
 .profile-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .profile-identity {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .profile-icons {
     display: flex;
-    gap: 0.35rem;
+    gap: 0.8rem;
 }
 
 .profile-name {
-    font-size: 1.8rem;
+    font-size: 2.5rem;
     font-weight: 800;
-    margin-bottom: 0;
+    margin: 0;
+    letter-spacing: -1px;
 }
 
 .profile-subtitle {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 300;
+    color: var(--text-dim);
+    margin: 0;
+    font-size: 1.1rem;
 }
 
-.profile-close {
-    background: none;
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    color: var(--text-muted);
-    font-size: 1.5rem;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    line-height: 1;
-}
-
-.profile-close:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: var(--horde-color);
-}
-
+/* Top Stat Cards */
 .profile-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
 }
 
 .profile-stat {
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.2rem;
     border-radius: 12px;
-    padding: 1rem;
     text-align: center;
-    transition: border-color 0.3s ease;
-}
-
-.profile-stat:hover {
-    border-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .profile-stat-value {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 800;
-    line-height: 1;
+    color: #fff;
     margin-bottom: 0.3rem;
+    font-family: 'Outfit', sans-serif;
 }
 
 .profile-stat-label {
+    font-size: 0.75rem;
     color: var(--text-dim);
-    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-weight: 400;
 }
 
+/* Main Layout Grid */
+.profile-main-grid {
+    margin-bottom: 2rem;
+}
+
+.profile-stats-container h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.profile-table-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 1.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.table-title {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.profile-data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profile-data-table current {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.profile-data-table thead th {
+    padding: 0.5rem 0;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.profile-data-table tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.profile-data-table tr:last-child {
+    border-bottom: none;
+}
+
+.profile-data-table td {
+    padding: 0.9rem 0;
+}
+
+.profile-data-table .label {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-data-table .value {
+    color: var(--text-color);
+    font-weight: 600;
+    text-align: right;
+    font-size: 1.05rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Charts Grid */
 .profile-charts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background: rgba(15, 23, 42, 0.2);
+    padding: 1.5rem;
+}
+
+/* Detail Panels */
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.profile-detail-panel {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.profile-detail-panel h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+}
+
+.profile-detail-panel.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-list {
+    display: flex;
+    flex-direction: column;
     gap: 1.2rem;
-    margin-bottom: 1.2rem;
 }
 
-.profile-charts-grid .card {
-    padding: 1.2rem;
-    margin-bottom: 0;
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.profile-charts-grid .card:hover {
-    transform: none;
+.detail-item-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: 500;
 }
+
+.detail-item-header span:last-child {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
+.detail-item-bar-bg {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.detail-item-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #34d399);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+/* Close Button Override */
+.profile-close {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.profile-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    transform: rotate(90deg);
+}
+
+@media (max-width: 992px) {
+    .profile-tables-wrapper,
+    .profile-charts-grid,
+    .profile-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==================== */
+/* 6. Leaderboards      */
+/* ==================== */
 
 /* ==================== */
 /* Match Detail         */
