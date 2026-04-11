@@ -100,12 +100,36 @@
 
             <!-- Leaderboards -->
             <div class="card full-width leaderboard-section">
-                <h2>🏆 Player Leaderboards</h2>
-                <p class="card-subtitle">Top performers across all tracked matches (min. 50 matches)</p>
+                <div class="leaderboard-header">
+                    <div>
+                        <h2>🏆 Player Leaderboards</h2>
+                        <p class="card-subtitle">Top performers across all tracked matches</p>
+                    </div>
+                    <div class="leaderboard-controls">
+                        <div class="lb-control-group">
+                            <span class="filter-label">Mode:</span>
+                            <div class="filter-pills" id="mode-pills">
+                                <button class="filter-pill active" data-mode="avg">Average</button>
+                                <button class="filter-pill" data-mode="total">Total</button>
+                            </div>
+                        </div>
+                        <div class="lb-control-group">
+                            <span class="filter-label">Min. Matches:</span>
+                            <div class="filter-pills" id="min-match-pills">
+                                <button class="filter-pill" data-min="0">0</button>
+                                <button class="filter-pill" data-min="10">10</button>
+                                <button class="filter-pill" data-min="25">25</button>
+                                <button class="filter-pill active" data-min="50">50</button>
+                                <button class="filter-pill" data-min="100">100</button>
+                                <button class="filter-pill" data-min="500">500</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="leaderboard-grid">
                     <div class="leaderboard-panel">
                         <h3 class="leaderboard-title">
-                            <span class="lb-icon">⚔️</span> Most Active
+                            <span class="lb-icon">⚔️</span> Most Matches
                         </h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-active">
@@ -113,6 +137,7 @@
                                 <tbody></tbody>
                             </table>
                         </div>
+                        <button class="load-more-btn" data-board="active">Load more</button>
                     </div>
                     <div class="leaderboard-panel">
                         <h3 class="leaderboard-title">
@@ -124,6 +149,7 @@
                                 <tbody></tbody>
                             </table>
                         </div>
+                        <button class="load-more-btn" data-board="damage">Load more</button>
                     </div>
                     <div class="leaderboard-panel">
                         <h3 class="leaderboard-title">
@@ -135,6 +161,31 @@
                                 <tbody></tbody>
                             </table>
                         </div>
+                        <button class="load-more-btn" data-board="healing">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title">
+                            <span class="lb-icon">🗡️</span> Top Killing Blows
+                        </h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-kb">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg KB</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="kb">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title">
+                            <span class="lb-icon">⚡</span> Top Honorable Kills
+                        </h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-hk">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg HK</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="hk">Load more</button>
                     </div>
                 </div>
             </div>

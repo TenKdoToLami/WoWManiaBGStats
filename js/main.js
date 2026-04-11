@@ -78,7 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         db = new SQL.Database(new Uint8Array(buf));
 
         renderOverview(db);
-        renderLeaderboards(db);
+        initLeaderboardListeners(db); // Set up filter and load-more listeners
+        renderAllLeaderboards(db);    // Initial render
         renderRecentMatches(db);
 
         // If misc tab is active at load, init it now
@@ -526,79 +527,169 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ===================================
-    // 6. Leaderboards (with class icons)
+    // 6. Leaderboards (Endless & Filtered)
     // ===================================
-    function renderLeaderboards(db) {
+    const lbState = {
+        minMatches: 50,
+        mode: 'avg', // 'avg' or 'total'
+        boards: {
+            active: { offset: 0, limit: 15, exhausted: false },
+            damage: { offset: 0, limit: 15, exhausted: false },
+            healing: { offset: 0, limit: 15, exhausted: false },
+            kb: { offset: 0, limit: 15, exhausted: false },
+            hk: { offset: 0, limit: 15, exhausted: false }
+        }
+    };
+
+    function initLeaderboardListeners(db) {
+        // Mode filter pills (Avg vs Total)
+        document.querySelectorAll('#mode-pills .filter-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const val = pill.dataset.mode;
+                if (lbState.mode === val) return;
+
+                document.querySelectorAll('#mode-pills .filter-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                lbState.mode = val;
+                renderAllLeaderboards(db);
+            });
+        });
+
+        // Min matches filter pills
+        document.querySelectorAll('#min-match-pills .filter-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const val = parseInt(pill.dataset.min);
+                if (lbState.minMatches === val) return;
+
+                // Update UI
+                document.querySelectorAll('#min-match-pills .filter-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                // Update state and re-render
+                lbState.minMatches = val;
+                renderAllLeaderboards(db);
+            });
+        });
+
+        // Load more buttons
+        document.querySelectorAll('.load-more-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const boardKey = btn.dataset.board;
+                loadBoard(boardKey, db);
+            });
+        });
+    }
+
+    function renderAllLeaderboards(db) {
+        Object.keys(lbState.boards).forEach(key => {
+            loadBoard(key, db, true);
+        });
+    }
+
+    function loadBoard(key, db, reset = false) {
+        if (!db) return;
+        const state = lbState.boards[key];
+        const mode = lbState.mode;
+        const isAvg = mode === 'avg';
+        const aggFunc = isAvg ? 'AVG' : 'SUM';
+
+        if (reset) {
+            state.offset = 0;
+            state.exhausted = false;
+            const panel = $(`lb-${key}`);
+            panel.querySelector('tbody').innerHTML = '';
+
+            // Update table header based on mode
+            const th = panel.querySelector('thead th:last-child');
+            if (key !== 'active') {
+                const label = key === 'damage' ? 'Damage' :
+                    key === 'healing' ? 'Healing' :
+                        key === 'kb' ? 'KB' : 'HK';
+                th.innerText = `${isAvg ? 'Avg' : 'Total'} ${label}`;
+            }
+
+            const btn = document.querySelector(`.load-more-btn[data-board="${key}"]`);
+            if (btn) btn.classList.remove('exhausted');
+        }
+
+        if (state.exhausted) return;
+
+        const min = lbState.minMatches;
+        let query = "";
+        let formatter = v => v.toLocaleString();
+
+        // Optimized subquery for main_class to avoid repeated scans
+        const classSubquery = `(SELECT ps2.class_id FROM player_stats ps2 WHERE ps2.character_id = cm.id AND ps2.class_id > 0 GROUP BY ps2.class_id ORDER BY COUNT(*) DESC LIMIT 1)`;
+
+        switch (key) {
+            case 'active':
+                query = `
+                    SELECT cm.name, COUNT(DISTINCT ps.match_id) as val, cm.id, ${classSubquery} as main_class
+                    FROM player_stats ps JOIN character_map cm ON ps.character_id = cm.id
+                    WHERE cm.name != 'Unknown' AND cm.id > 0
+                    GROUP BY ps.character_id 
+                    HAVING val >= ${min}
+                    ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
+                `;
+                break;
+            case 'damage':
+            case 'healing':
+                query = `
+                    SELECT cm.name, CAST(${aggFunc}(ps.${key}) AS INTEGER) as val, cm.id, ${classSubquery} as main_class
+                    FROM player_stats ps JOIN character_map cm ON ps.character_id = cm.id
+                    WHERE ps.class_id > 0 AND cm.name != 'Unknown' AND cm.id > 0
+                    GROUP BY ps.character_id HAVING COUNT(*) >= ${min}
+                    ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
+                `;
+                break;
+            case 'kb':
+            case 'hk':
+                query = `
+                    SELECT cm.name, CAST(${aggFunc}(ps.${key}) AS FLOAT) as val, cm.id, ${classSubquery} as main_class
+                    FROM player_stats ps JOIN character_map cm ON ps.character_id = cm.id
+                    WHERE ps.class_id > 0 AND cm.name != 'Unknown' AND cm.id > 0
+                    GROUP BY ps.character_id HAVING COUNT(*) >= ${min}
+                    ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
+                `;
+                formatter = v => isAvg ? v.toFixed(1) : v.toLocaleString();
+                break;
+        }
+
         try {
-            // Most Active
-            const resActive = db.exec(`
-                SELECT cm.name, COUNT(DISTINCT ps.match_id) as matches, cm.id,
-                       (SELECT ps2.class_id FROM player_stats ps2 WHERE ps2.character_id = cm.id AND ps2.class_id > 0 
-                        GROUP BY ps2.class_id ORDER BY COUNT(*) DESC LIMIT 1) as main_class
-                FROM player_stats ps 
-                JOIN character_map cm ON ps.character_id = cm.id
-                WHERE cm.name != 'Unknown' AND cm.id > 0
-                GROUP BY ps.character_id 
-                ORDER BY matches DESC 
-                LIMIT 15
-            `);
-            if (resActive.length > 0) {
-                populateLeaderboard('lb-active', resActive[0].values, v => v.toLocaleString(), true);
+            const res = db.exec(query);
+            if (res.length === 0 || res[0].values.length === 0) {
+                state.exhausted = true;
+                const btn = document.querySelector(`.load-more-btn[data-board="${key}"]`);
+                if (btn) btn.classList.add('exhausted');
+                return;
             }
 
-            // Top Damage
-            const resDmg = db.exec(`
-                SELECT cm.name, CAST(AVG(ps.damage) AS INTEGER) as val, cm.id,
-                       (SELECT ps2.class_id FROM player_stats ps2 WHERE ps2.character_id = cm.id AND ps2.class_id > 0 
-                        GROUP BY ps2.class_id ORDER BY COUNT(*) DESC LIMIT 1) as main_class
-                FROM player_stats ps 
-                JOIN character_map cm ON ps.character_id = cm.id 
-                WHERE ps.class_id > 0 AND cm.name != 'Unknown' AND cm.id > 0
-                GROUP BY ps.character_id 
-                HAVING COUNT(*) >= 50
-                ORDER BY val DESC 
-                LIMIT 15
-            `);
-            if (resDmg.length > 0) {
-                populateLeaderboard('lb-damage', resDmg[0].values, v => v.toLocaleString(), true);
-            }
+            const rows = res[0].values;
+            appendLeaderboardRows(`lb-${key}`, rows, state.offset, formatter);
 
-            // Top Healing
-            const resHeal = db.exec(`
-                SELECT cm.name, CAST(AVG(ps.healing) AS INTEGER) as val, cm.id,
-                       (SELECT ps2.class_id FROM player_stats ps2 WHERE ps2.character_id = cm.id AND ps2.class_id > 0 
-                        GROUP BY ps2.class_id ORDER BY COUNT(*) DESC LIMIT 1) as main_class
-                FROM player_stats ps 
-                JOIN character_map cm ON ps.character_id = cm.id 
-                WHERE ps.class_id > 0 AND cm.name != 'Unknown' AND cm.id > 0
-                GROUP BY ps.character_id 
-                HAVING COUNT(*) >= 50
-                ORDER BY val DESC 
-                LIMIT 15
-            `);
-            if (resHeal.length > 0) {
-                populateLeaderboard('lb-healing', resHeal[0].values, v => v.toLocaleString(), true);
+            state.offset += state.limit;
+            if (rows.length < state.limit) {
+                state.exhausted = true;
+                const btn = document.querySelector(`.load-more-btn[data-board="${key}"]`);
+                if (btn) btn.classList.add('exhausted');
             }
         } catch (e) {
-            console.error("Leaderboard Error:", e);
+            console.error(`Error loading board ${key}:`, e);
         }
     }
 
-    function populateLeaderboard(tableId, rows, formatter, withIcons = false) {
+    function appendLeaderboardRows(tableId, rows, startRank, formatter) {
         const tbody = document.querySelector(`#${tableId} tbody`);
         if (!tbody) return;
-        tbody.innerHTML = '';
 
         rows.forEach((row, i) => {
             const tr = document.createElement('tr');
-            const rank = i + 1;
+            const rank = startRank + i + 1;
             const medal = rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : rank;
-            const name = row[0];
-            const value = row[1];
-            const charId = row[2];
-            const classId = withIcons ? row[3] : 0;
+            const [name, value, charId, classId] = row;
 
-            const iconHtml = withIcons && classId ? Icons.classIcon(classId, 20) : '';
+            const iconHtml = classId ? Icons.classIcon(classId, 20) : '';
             tr.innerHTML = `
                 <td>${medal}</td>
                 <td><div class="lb-player-cell">${iconHtml}<span>${escapeHtml(name)}</span></div></td>
@@ -831,7 +922,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             grid: { color: 'rgba(255,255,255,0.03)' },
                             ticks: {
                                 maxTicksLimit: 16,
-                                callback: function(val) {
+                                callback: function (val) {
                                     const label = this.getLabelForValue(val);
                                     if (label && label.endsWith('-01')) return label.substring(0, 4);
                                     return null;
@@ -1105,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: function(ctx) {
+                                label: function (ctx) {
                                     const row = values[ctx.dataIndex];
                                     return `K/D: ${parseFloat(row[3]).toFixed(2)} (${row[1].toLocaleString()} KB / ${row[2].toLocaleString()} Deaths)`;
                                 }
@@ -1159,9 +1250,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: function(ctx) {
+                                label: function (ctx) {
                                     const row = values[ctx.dataIndex];
-                                    return `Win Rate: ${((row[2]/row[1])*100).toFixed(1)}% (${row[2].toLocaleString()} wins / ${row[1].toLocaleString()} games)`;
+                                    return `Win Rate: ${((row[2] / row[1]) * 100).toFixed(1)}% (${row[2].toLocaleString()} wins / ${row[1].toLocaleString()} games)`;
                                 }
                             }
                         }
