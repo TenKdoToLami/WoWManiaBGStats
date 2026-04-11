@@ -148,9 +148,8 @@ def worker():
     """ Worker thread that continuously fetches and parses pages. """
     while running:
         try:
-            item = task_queue.get(timeout=2)
+            item = task_queue.get(timeout=1)
         except:
-            # Re-check running flag if queue is empty
             continue
             
         bg_id, retries = item
@@ -185,15 +184,26 @@ def get_map_id(c, table, name):
     c.execute(f"SELECT id FROM {table} WHERE name=?", (name,))
     return c.fetchone()[0]
 
-def db_writer():
+def db_writer(dynamic_mode=False):
     """ Dedicated writer thread to safely write SQLite operations sequentially. """
+    global running
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     inserts_since_commit = 0
+    total_inserts = 0
+    
+    latest_success_id = 0
+    max_invalid_id = 0
+    
+    # Grab current max id to establish baseline
+    c.execute("SELECT MAX(id) FROM matches")
+    baseline = c.fetchone()[0]
+    if baseline:
+        latest_success_id = baseline
     
     while running or not result_queue.empty():
         try:
-            res = result_queue.get(timeout=2)
+            res = result_queue.get(timeout=1)
         except:
             if inserts_since_commit > 0:
                 conn.commit()
@@ -203,7 +213,9 @@ def db_writer():
         status, bg_id, retries, match_data, player_data = res
         
         if status == 'SUCCESS':
-            
+            if bg_id > latest_success_id:
+                latest_success_id = bg_id
+                
             real_bg_id = get_map_id(c, 'bg_map', match_data[1])
             bracket_id = get_map_id(c, 'bracket_map', match_data[2])
             
@@ -216,7 +228,6 @@ def db_writer():
                 race_id = get_map_id(c, 'race_map', p[4])
                 final_player_data.append((p[0], char_id, p[2], p[3], race_id, p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12]))
 
-            
             # Remove any existing data cleanly to avoid duplication
             c.execute("DELETE FROM matches WHERE id=?", (bg_id,))
             c.execute("DELETE FROM player_stats WHERE match_id=?", (bg_id,))
@@ -226,11 +237,14 @@ def db_writer():
             c.executemany("INSERT INTO player_stats VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", final_player_data)
             print(f"[SUCCESS] ID {bg_id}: {match_data[1]} ({match_data[2]})")
             inserts_since_commit += 1
+            total_inserts += 1
             
         elif status == 'INVALID':
             # Missing or Invalid Page (e.g. 200 response but empty page).
             print(f"[INVALID] ID {bg_id}: No valid data found. Skipping.")
-            
+            if bg_id > max_invalid_id:
+                max_invalid_id = bg_id
+                
         elif status == 'FAILED':
             # Network issue or Error. 
             if retries < MAX_RETRIES:
@@ -238,46 +252,71 @@ def db_writer():
                 task_queue.put((bg_id, retries + 1))
             else:
                 print(f"[FAILED] ID {bg_id}: Reached max network retries.")
+                if bg_id > max_invalid_id:
+                    max_invalid_id = bg_id
                 
         if inserts_since_commit >= 50:
             conn.commit()
             inserts_since_commit = 0
             
+        # Stopping mechanism for dynamic mode
+        if dynamic_mode and running:
+            # If our invalid IDs have pushed 100 entries beyond our last known success, assume dead end.
+            if max_invalid_id > latest_success_id + 100:
+                print(f"\n[AUTO-STOP] Hit a dead end 100 IDs past latest success ({latest_success_id}). Safely stopping!")
+                running = False
+            
     conn.commit()
+    
+    run_ts = time.strftime('%Y-%m-%d %H:%M:%S')
+    c.execute("CREATE TABLE IF NOT EXISTS scrape_runs (id INTEGER PRIMARY KEY, timestamp TEXT, matches_added INTEGER)")
+    c.execute("INSERT INTO scrape_runs (timestamp, matches_added) VALUES (?, ?)", (run_ts, total_inserts))
+    conn.commit()
+        
     conn.close()
 
-def populate_queue(start_id, end_id):
+def get_db_max_id():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    
-    print("Reading local database to check progress...")
-    # Select parsed IDs directly from matches to act as tmp memory status tracking
-    c.execute(f"SELECT id FROM matches WHERE id BETWEEN {start_id} AND {end_id}")
-    existing = set(row[0] for row in c.fetchall())
+    c.execute("SELECT MAX(id) FROM matches")
+    res = c.fetchone()[0]
     conn.close()
-    
-    enqueued = 0
-    for bg_id in range(start_id, end_id + 1):
-        if bg_id not in existing:
-            task_queue.put((bg_id, 0)) # (bg_id, retries=0)
-            enqueued += 1
-            
-    return enqueued
+    return res if res else 0
 
-def start_scraper(start_id, end_id, threads=10):
+def start_scraper(start_id=None, end_id=None, threads=10):
     global running
     
     init_db()
-    enqueued_count = populate_queue(start_id, end_id)
+    dynamic_mode = False
     
-    if enqueued_count == 0:
-        print("All IDs in range have already been successfully checked! Exiting.")
-        return
-
-    print(f"Loaded {enqueued_count} matches into queue. Starting {threads} threads...")
+    if start_id is None and end_id is None:
+        dynamic_mode = True
+        start_id = get_db_max_id() + 1
+        print(f"--- DYNAMIC SCRAPING MODE INITIATED ---")
+        print(f"Starting from ID {start_id}. Scraper will automatically stop when no more matches exist.")
+    else:
+        # Traditional ranged checking to enqueue
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        print("Reading local database to check progress...")
+        c.execute(f"SELECT id FROM matches WHERE id BETWEEN {start_id} AND {end_id}")
+        existing = set(row[0] for row in c.fetchall())
+        conn.close()
+        
+        enqueued = 0
+        for bg_id in range(start_id, end_id + 1):
+            if bg_id not in existing:
+                task_queue.put((bg_id, 0))
+                enqueued += 1
+                
+        if enqueued == 0:
+            print("All IDs in range have already been successfully checked! Exiting.")
+            return
+        else:
+            print(f"Loaded {enqueued} matches into queue. Starting {threads} threads...")
 
     # Start DB Writer thread
-    writer_thread = threading.Thread(target=db_writer)
+    writer_thread = threading.Thread(target=db_writer, args=(dynamic_mode,))
     writer_thread.start()
 
     # Start Worker threads
@@ -302,9 +341,20 @@ def start_scraper(start_id, end_id, threads=10):
     input_thread.start()
 
     try:
-        # Instead of blocking on task_queue.join(), we check the status every 1 second
-        while running and task_queue.unfinished_tasks > 0:
-            time.sleep(1)
+        
+        if dynamic_mode:
+            current_id = start_id
+            while running:
+                # Dynamically feed queue ahead of threads just enough to keep them busy
+                while task_queue.qsize() < threads * 3 and running:
+                    task_queue.put((current_id, 0))
+                    current_id += 1
+                time.sleep(1)
+        else:
+            # Ranged mode
+            while running and task_queue.unfinished_tasks > 0:
+                time.sleep(1)
+                
     except KeyboardInterrupt:
         pass
     finally:
@@ -319,15 +369,24 @@ def start_scraper(start_id, end_id, threads=10):
         print("Scraping completed and saved.")
 
 if __name__ == '__main__':
-    # Add simple argument parsing
-    if len(sys.argv) < 3:
-        print("Usage: python scraper.py <start_id> <end_id> [threads]")
-        print("Example: python scraper.py 1 27674 15")
-    else:
-        try:
-            start_val = int(sys.argv[1])
-            end_val = int(sys.argv[2])
-            threads_val = int(sys.argv[3]) if len(sys.argv) > 3 else MAX_THREADS
-            start_scraper(start_val, end_val, threads_val)
-        except ValueError:
-            print("Arguments must be numbers!")
+    # Parse arguments
+    try:
+        if len(sys.argv) == 1:
+            # Dynamic Mode (no arguments provided)
+            start_scraper(threads=MAX_THREADS)
+        elif len(sys.argv) == 3:
+            s_val = int(sys.argv[1])
+            e_val = int(sys.argv[2])
+            start_scraper(s_val, e_val, MAX_THREADS)
+        elif len(sys.argv) >= 4:
+            s_val = int(sys.argv[1])
+            e_val = int(sys.argv[2])
+            t_val = int(sys.argv[3])
+            start_scraper(s_val, e_val, t_val)
+        else:
+            print("Usage Options:")
+            print("  python scraper.py                              (Dynamic Mode: Auto-finds new matches)")
+            print("  python scraper.py <start_id> <end_id>          (Ranged Mode: Scrapes specific range)")
+            print("  python scraper.py <start_id> <end_id> [threads] (Ranged Mode w/ Thread Control)")
+    except ValueError:
+        print("Arguments must be numbers!")

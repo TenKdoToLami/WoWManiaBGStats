@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WoW-Mania BG Analytics</title>
+    <meta name="description" content="Comprehensive PvP battleground analytics for WoW-Mania — tracking 27,000+ matches and 380,000+ player records from 2015 to 2026.">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <!-- Chart.js for data visualization -->
@@ -15,63 +16,305 @@
     <div class="container">
         <header>
             <h1><span class="highlight">WoW-Mania</span> Battleground Analytics</h1>
-            <p>Data scraped directly from WoW-Mania PvP rankings. Tracking <span id="total-matches">...</span> matches and <span id="total-players">...</span> players.</p>
+            <p>Data scraped directly from WoW-Mania PvP rankings. Tracking <span id="total-matches">...</span> matches and <span id="total-players">...</span> unique characters.</p>
         </header>
 
-        <div class="dashboard">
-            <!-- Overall overview card -->
-            <div class="card stat-card full-width">
-                <h2>Faction Dominance</h2>
-                <div class="stat-content">
-                    <div class="faction horde">
-                        <img src="img/horde_min.png" alt="Horde">
-                        <div class="faction-data">
-                            <h3>Horde</h3>
-                            <p class="win-count" id="horde-wins">0</p>
-                            <span class="label">Wins</span>
-                        </div>
-                    </div>
-                    
-                    <div class="vs"><h2>VS</h2></div>
-                    
-                    <div class="faction alliance">
-                        <div class="faction-data right">
-                            <h3>Alliance</h3>
-                            <p class="win-count" id="alliance-wins">0</p>
-                            <span class="label">Wins</span>
-                        </div>
-                        <img src="img/alliance_min.png" alt="Alliance">
-                    </div>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar horde-bar" id="dom-horde-bar" style="width: 50%;"></div>
-                    <div class="progress-bar alliance-bar" id="dom-alliance-bar" style="width: 50%;"></div>
+        <!-- Tab Navigation -->
+        <nav class="tab-nav" id="tab-nav">
+            <button class="tab-btn active" data-tab="players" id="tab-btn-players">
+                <img src="img/1.jpg" alt="" class="tab-icon">
+                <span>Players</span>
+            </button>
+            <button class="tab-btn" data-tab="matches" id="tab-btn-matches">
+                <img src="img/horde_min.png" alt="" class="tab-icon">
+                <span>Matches</span>
+            </button>
+            <button class="tab-btn" data-tab="misc" id="tab-btn-misc">
+                <img src="img/alliance_min.png" alt="" class="tab-icon">
+                <span>Analytics</span>
+            </button>
+        </nav>
+
+        <!-- ============================= -->
+        <!-- TAB 1: PLAYERS                -->
+        <!-- ============================= -->
+        <div class="tab-content active" id="tab-players">
+            <!-- Search Bar -->
+            <div class="search-section">
+                <div class="search-wrapper">
+                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="player-search" class="search-input" placeholder="Search player by name..." autocomplete="off">
+                    <div class="search-results" id="player-search-results"></div>
                 </div>
             </div>
 
-            <div class="card chart-card">
-                <h2>Battlegrounds Played & Win Rate</h2>
-                <div class="chart-container">
-                    <canvas id="bgChart"></canvas>
+            <!-- Player Profile (hidden by default, shown on search) -->
+            <div class="player-profile-section hidden" id="player-profile">
+                <div class="card full-width profile-card">
+                    <div class="profile-header">
+                        <div class="profile-identity">
+                            <div class="profile-icons" id="profile-icons"></div>
+                            <div>
+                                <h2 class="profile-name" id="profile-name">—</h2>
+                                <p class="profile-subtitle" id="profile-subtitle">—</p>
+                            </div>
+                        </div>
+                        <button class="profile-close" id="profile-close" title="Close profile">&times;</button>
+                    </div>
+                    <div class="profile-stats-grid" id="profile-stats-grid">
+                        <!-- Stat cards injected here -->
+                    </div>
+                    <div class="profile-charts-grid">
+                        <div class="card chart-card">
+                            <h3>📈 Activity Over Time</h3>
+                            <div class="chart-container chart-sm">
+                                <canvas id="playerActivityChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>🏰 Performance by Battleground</h3>
+                            <div class="chart-container chart-sm">
+                                <canvas id="playerBgChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-charts-grid">
+                        <div class="card chart-card">
+                            <h3>⚔️ Class Distribution</h3>
+                            <div class="chart-container chart-sm">
+                                <canvas id="playerClassChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>📊 Recent Match History</h3>
+                            <div class="leaderboard-table-wrap" style="max-height: 340px;">
+                                <table class="leaderboard-table" id="player-match-history">
+                                    <thead><tr><th>Date</th><th>BG</th><th>Result</th><th>Dmg</th><th>Heal</th><th>KB</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card chart-card">
-                <h2>Class Popularity & Average Demographics</h2>
-                <div class="chart-container">
-                    <canvas id="classChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="card chart-card full-width">
-                <h2>Average Damage & Healing per Class</h2>
-                <div class="chart-container">
-                    <canvas id="performanceChart"></canvas>
+            <!-- Leaderboards -->
+            <div class="card full-width leaderboard-section">
+                <h2>🏆 Player Leaderboards</h2>
+                <p class="card-subtitle">Top performers across all tracked matches (min. 50 matches)</p>
+                <div class="leaderboard-grid">
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title">
+                            <span class="lb-icon">⚔️</span> Most Active
+                        </h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-active">
+                                <thead><tr><th>#</th><th>Player</th><th>Matches</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title">
+                            <span class="lb-icon">💥</span> Top Damage
+                        </h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-damage">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg Damage</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title">
+                            <span class="lb-icon">💚</span> Top Healing
+                        </h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-healing">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg Healing</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- ============================= -->
+        <!-- TAB 2: MATCHES                -->
+        <!-- ============================= -->
+        <div class="tab-content" id="tab-matches">
+            <!-- Search Bar -->
+            <div class="search-section">
+                <div class="search-wrapper search-wrapper-compact">
+                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="number" id="match-search" class="search-input" placeholder="Search match by ID..." autocomplete="off">
+                    <button class="search-btn" id="match-search-btn">Lookup</button>
+                </div>
+            </div>
+
+            <!-- Match Detail (hidden by default) -->
+            <div class="match-detail-section hidden" id="match-detail">
+                <div class="card full-width match-detail-card">
+                    <div class="match-detail-header">
+                        <div class="match-detail-info" id="match-detail-info">
+                            <!-- Injected: BG name, date, duration, winner -->
+                        </div>
+                        <button class="profile-close" id="match-close" title="Close match detail">&times;</button>
+                    </div>
+                    <div class="leaderboard-table-wrap" style="max-height: 600px;">
+                        <table class="scoreboard-table" id="match-scoreboard">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th class="icon-col">Class</th>
+                                    <th class="icon-col">Race</th>
+                                    <th>KB</th>
+                                    <th>Deaths</th>
+                                    <th>HK</th>
+                                    <th>Honor</th>
+                                    <th>Damage</th>
+                                    <th>Healing</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Matches -->
+            <div class="card full-width">
+                <h2>🕐 Recent Matches</h2>
+                <p class="card-subtitle">Last 100 recorded battleground matches</p>
+                <div class="leaderboard-table-wrap" style="max-height: 700px;">
+                    <table class="leaderboard-table recent-matches-table" id="recent-matches">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Battleground</th>
+                                <th>Bracket</th>
+                                <th>Winner</th>
+                                <th>Date</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- TAB 3: MISC / ANALYTICS       -->
+        <!-- ============================= -->
+        <div class="tab-content" id="tab-misc">
+            <div class="dashboard">
+                <!-- Faction Dominance -->
+                <div class="card stat-card full-width">
+                    <h2>Faction Dominance</h2>
+                    <div class="stat-content">
+                        <div class="faction horde">
+                            <img src="img/horde_min.png" alt="Horde">
+                            <div class="faction-data">
+                                <h3>Horde</h3>
+                                <p class="win-count" id="horde-wins">0</p>
+                                <span class="label">Wins</span>
+                            </div>
+                        </div>
+                        <div class="vs"><h2>VS</h2></div>
+                        <div class="faction alliance">
+                            <div class="faction-data right">
+                                <h3>Alliance</h3>
+                                <p class="win-count" id="alliance-wins">0</p>
+                                <span class="label">Wins</span>
+                            </div>
+                            <img src="img/alliance_min.png" alt="Alliance">
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar horde-bar" id="dom-horde-bar" style="width: 50%;"></div>
+                        <div class="progress-bar alliance-bar" id="dom-alliance-bar" style="width: 50%;"></div>
+                    </div>
+                </div>
+
+                <!-- Server Activity Over Time -->
+                <div class="card chart-card full-width">
+                    <h2>📈 Server Activity Over Time</h2>
+                    <p class="card-subtitle">Monthly match volume — a decade of WoW-Mania PvP</p>
+                    <div class="chart-container chart-wide">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Faction Win Rate per BG -->
+                <div class="card chart-card">
+                    <h2>🏰 Faction Win Rate per BG</h2>
+                    <p class="card-subtitle">Horde dominance varies wildly by map</p>
+                    <div class="chart-container">
+                        <canvas id="factionWinRateChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Faction Balance Over Time -->
+                <div class="card chart-card">
+                    <h2>⚖️ Faction Balance Over Time</h2>
+                    <p class="card-subtitle">Yearly Horde vs Alliance win percentage</p>
+                    <div class="chart-container">
+                        <canvas id="factionBalanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- BG Wins Distribution -->
+                <div class="card chart-card">
+                    <h2>Battlegrounds Played & Win Rate</h2>
+                    <div class="chart-container">
+                        <canvas id="bgChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Class Popularity -->
+                <div class="card chart-card">
+                    <h2>Class Popularity</h2>
+                    <div class="chart-container">
+                        <canvas id="classChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Avg Damage & Healing per Class -->
+                <div class="card chart-card full-width">
+                    <h2>⚔️ Average Damage & Healing per Class</h2>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- K/D Ratio by Class -->
+                <div class="card chart-card">
+                    <h2>💀 K/D Ratio by Class</h2>
+                    <p class="card-subtitle">Killing Blow to Death ratio — ranged DPS dominates</p>
+                    <div class="chart-container">
+                        <canvas id="kdChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Class Win Rate -->
+                <div class="card chart-card">
+                    <h2>🏆 Class Win Rate</h2>
+                    <p class="card-subtitle">Which classes end up on the winning team most often</p>
+                    <div class="chart-container">
+                        <canvas id="classWinRateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Data sourced from <a href="https://wow-mania.org" target="_blank" rel="noopener">wow-mania.org</a> PvP statistics. Dashboard built with Chart.js & sql.js.</p>
+        </footer>
     </div>
     
+    <script src="js/icons.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
