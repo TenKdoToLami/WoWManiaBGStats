@@ -41,6 +41,14 @@ def init_db():
                  (match_id INTEGER, character_id INTEGER, faction_id INTEGER, class_id INTEGER, race_id INTEGER, 
                   kb INTEGER, deaths INTEGER, hk INTEGER, bonus_honor INTEGER, damage INTEGER, healing INTEGER, 
                   attr1 INTEGER, attr2 INTEGER)''')
+    
+    # Specialized table for sync status
+    c.execute('''CREATE TABLE IF NOT EXISTS sync_info (id INTEGER PRIMARY KEY, run_time TEXT, match_count INTEGER)''')
+    
+    # Cleanup old tables
+    c.execute("DROP TABLE IF EXISTS scrape_runs")
+    c.execute("DROP TABLE IF EXISTS metadata")
+    
     conn.commit()
     conn.close()
 
@@ -273,11 +281,18 @@ def db_writer(dynamic_mode=False):
             
     conn.commit()
     
-    run_ts = time.strftime('%Y-%m-%d %H:%M:%S')
-    c.execute("CREATE TABLE IF NOT EXISTS scrape_runs (id INTEGER PRIMARY KEY, timestamp TEXT, matches_added INTEGER)")
-    c.execute("INSERT INTO scrape_runs (timestamp, matches_added) VALUES (?, ?)", (run_ts, total_inserts))
-    conn.commit()
+    # Update unified sync info
+    try:
+        ts = time.strftime('%Y-%m-%d %H:%M:%S')
+        c.execute("INSERT INTO sync_info (run_time, match_count) VALUES (?, ?)", (ts, total_inserts))
+        conn.commit()
+    except: pass
         
+    try:
+        # Crucial for static web hosting: merge the WAL journal back into the main .db file 
+        c.execute("PRAGMA wal_checkpoint(TRUNCATE);")
+    except: pass
+
     conn.close()
 
 def get_db_max_id():
@@ -371,6 +386,10 @@ def start_scraper(start_id=None, end_id=None, threads=10):
             t.join()
             
         writer_thread.join()
+        
+        # Final commit already handled in db_writer
+        pass
+        
         print("Scraping completed and saved.")
 
 if __name__ == '__main__':

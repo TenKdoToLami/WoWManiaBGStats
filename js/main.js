@@ -173,7 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sqlPromise = initSqlJs({
             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
-        const dataPromise = fetch("data/pvpstats.db").then(res => res.arrayBuffer());
+        // Mandatory cache buster to bypass browser/proxy persistence
+        const dataPromise = fetch("data/pvpstats.db?t=" + Date.now()).then(res => res.arrayBuffer());
 
         const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
 
@@ -215,18 +216,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ===================================
-    // 3. Overview Stats
+    // GLOBAL HEADER STATS
     // ===================================
     function renderOverview(db) {
         try {
+            let syncTime = null;
+            let syncMatches = 0;
+            let label = "Sync Check: ";
+
+            // 1. Fetch from specialized Sync Info table
+            try {
+                // Ensure table exists safely
+                const hasTable = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='sync_info'");
+                if (hasTable.length > 0 && hasTable[0].values.length > 0) {
+                    const resSync = db.exec("SELECT run_time, match_count FROM sync_info ORDER BY id DESC LIMIT 1");
+                    if (resSync.length > 0 && resSync[0].values.length > 0) {
+                        syncTime = resSync[0].values[0][0];
+                        syncMatches = parseInt(resSync[0].values[0][1]) || 0;
+                    }
+                }
+            } catch (e) { console.warn("Sync Info table check failed:", e); }
+
+            // Fallback to match date if sync_info was empty or missing
+            if (!syncTime) {
+                try {
+                    const resSyncFallback = db.exec("SELECT date FROM matches ORDER BY id DESC LIMIT 1");
+                    if (resSyncFallback.length > 0 && resSyncFallback[0].values.length > 0) {
+                        syncTime = resSyncFallback[0].values[0][0];
+                    }
+                } catch (e) { console.warn("Fallback matches date check failed:", e); }
+            }
+
+            // 2. Update Sync Badge
+            const syncEl = $('sync-status');
+            if (syncEl) {
+                if (syncTime) {
+                    // Try parsing correctly even if Safari/JS complains about SQLite space ' ' separator
+                    let safeTimeStr = syncTime;
+                    if (safeTimeStr.length === 19 && safeTimeStr.includes(' ')) {
+                        safeTimeStr = safeTimeStr.replace(' ', 'T'); 
+                    }
+                    
+                    const dateObj = new Date(safeTimeStr);
+                    let dateStr = syncTime;
+                    
+                    if (!isNaN(dateObj.getTime())) {
+                        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                        dateStr = dateObj.toLocaleDateString(undefined, options);
+                    }
+                    
+                    let html = `${label}<b>${dateStr}</b>`;
+                    if (syncMatches > 0) {
+                        html += `<span class="new-indicator" style="margin-left: 6px; color: var(--accent); font-size: 0.85em;">(+${syncMatches} New)</span>`;
+                    }
+                    syncEl.innerHTML = html;
+                } else {
+                    syncEl.innerHTML = `${label}<b>Never</b>`;
+                }
+            }
+
+            // 4. Update Global Totals
             const resMatches = db.exec("SELECT COUNT(*) FROM matches");
-            const total_matches = resMatches[0].values[0][0];
+            const total_matches = resMatches[0].values[0][0] || 0;
+            if ($('total-matches')) $('total-matches').innerText = total_matches.toLocaleString();
 
             const resPlayers = db.exec("SELECT COUNT(*) FROM character_map WHERE id > 0");
-            const total_players = resPlayers[0].values[0][0];
-
-            $('total-matches').innerText = total_matches.toLocaleString();
-            $('total-players').innerText = total_players.toLocaleString();
+            const total_players = resPlayers[0].values[0][0] || 0;
+            if ($('total-players')) $('total-players').innerText = total_players.toLocaleString();
 
             const resWins = db.exec(`
                 SELECT winner_id, COUNT(*) as wins
@@ -243,13 +299,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
 
-            $('horde-wins').innerText = hordeWins.toLocaleString();
-            $('alliance-wins').innerText = allianceWins.toLocaleString();
+            if ($('horde-wins')) $('horde-wins').innerText = hordeWins.toLocaleString();
+            if ($('alliance-wins')) $('alliance-wins').innerText = allianceWins.toLocaleString();
 
             const total = hordeWins + allianceWins;
             if (total > 0) {
-                $('dom-horde-bar').style.width = ((hordeWins / total) * 100) + '%';
-                $('dom-alliance-bar').style.width = ((allianceWins / total) * 100) + '%';
+                const hBar = $('dom-horde-bar');
+                const aBar = $('dom-alliance-bar');
+                if (hBar) hBar.style.width = ((hordeWins / total) * 100) + '%';
+                if (aBar) aBar.style.width = ((allianceWins / total) * 100) + '%';
             }
         } catch (e) {
             console.error("Overview Error:", e);
@@ -1329,19 +1387,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderFactionBalanceOverTime(db) {
         try {
             const res = db.exec(`
-                SELECT SUBSTR(date,1,4) as year,
+                SELECT SUBSTR(date,1,7) as month,
                        SUM(CASE WHEN winner_id=1 THEN 1 ELSE 0 END) as horde,
                        SUM(CASE WHEN winner_id=2 THEN 1 ELSE 0 END) as alliance,
                        COUNT(*) as total
                 FROM matches WHERE winner_id > 0
-                GROUP BY year ORDER BY year
+                GROUP BY month ORDER BY month
             `);
             if (res.length === 0) return;
 
             const values = res[0].values;
             const labels = values.map(d => d[0]);
             const hordePct = values.map(d => ((d[1] / d[3]) * 100).toFixed(1));
-            const alliancePct = values.map(d => ((d[2] / d[3]) * 100).toFixed(1));
 
             const ctx = $('factionBalanceChart').getContext('2d');
             new Chart(ctx, {
@@ -1351,30 +1408,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                     datasets: [
                         {
                             label: 'Horde Win %', data: hordePct,
-                            borderColor: 'rgba(239, 68, 68, 1)', backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            fill: true, tension: 0.3, borderWidth: 2.5, pointRadius: 4,
-                            pointBackgroundColor: 'rgba(239, 68, 68, 1)'
+                            borderColor: '#fff', borderWidth: 2.5, tension: 0.4,
+                            pointRadius: 0, pointHitRadius: 10,
+                            fill: 'end', backgroundColor: 'rgba(239, 68, 68, 0.15)'
                         },
                         {
-                            label: 'Alliance Win %', data: alliancePct,
-                            borderColor: 'rgba(59, 130, 246, 1)', backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true, tension: 0.3, borderWidth: 2.5, pointRadius: 4,
-                            pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+                            label: 'Alliance Win % (Area)', data: hordePct,
+                            borderColor: 'transparent', fill: 'origin',
+                            backgroundColor: 'rgba(59, 130, 246, 0.15)', tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Balance Mark', data: labels.map(() => 50),
+                            borderColor: 'rgba(255,255,255,0.3)', borderDash: [5, 5],
+                            borderWidth: 1, fill: false, pointRadius: 0
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 30, max: 70, ticks: { callback: v => v + '%' } },
-                        x: { grid: { color: 'rgba(255,255,255,0.03)' } }
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            min: 30, max: 70,
+                            ticks: { callback: v => v + '%' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.03)' },
+                            ticks: {
+                                maxTicksLimit: 12,
+                                callback: function (val) {
+                                    const label = this.getLabelForValue(val);
+                                    return label ? label.substring(0, 4) : ''; // Just show years for cleaner axis
+                                }
+                            }
+                        }
                     },
                     plugins: {
-                        legend: { position: 'bottom' },
+                        legend: { display: false },
                         tooltip: {
                             enabled: false,
-                            external: (ctx) => externalTooltipHandler(ctx, 'faction')
+                            external: (ctx) => externalTooltipHandler(ctx, 'faction-balance')
                         }
                     }
                 }
@@ -1687,7 +1763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // 5. Total HKs
-            $('insight-icon-hks').innerHTML = `<img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_armornoble_a_01.jpg" style="width:36px;height:36px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)">`;
+            $('insight-icon-hks').innerHTML = `<img src="https://wow.zamimg.com/images/wow/icons/large/pve_pvp_icon.jpg" alt="HKs">`;
 
         } catch (e) {
             console.error("Analytics Landing Error:", e);
@@ -1748,36 +1824,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             let innerHtml = '<div class="tooltip-container">';
 
             titleLines.forEach(title => {
-                // Try to get icon for the title
                 let iconHtml = '';
+                // Don't show icon in header for balance chart
+                if (type !== 'faction-balance') {
+                    const firstBody = bodyLines.length > 0 ? String(bodyLines[0][0]) : '';
+                    const findKeyword = (title + ' ' + firstBody);
 
-                // For doughnut charts, the icon name might be in the first body line if title is empty
-                const firstBody = bodyLines.length > 0 ? String(bodyLines[0][0]) : '';
-                const findKeyword = (title + ' ' + firstBody);
-
-                if (type === 'class') {
-                    const classId = Object.keys(Icons.classMap).find(id => findKeyword.includes(Icons.classMap[id]));
-                    if (classId) iconHtml = Icons.classIcon(classId, 24);
-                } else if (type === 'race') {
-                    const raceId = Object.keys(Icons.raceIdToName).find(id => findKeyword.includes(Icons.raceIdToName[id]));
-                    if (raceId) iconHtml = Icons.raceIcon(raceId + '-0', 24);
-                } else if (type === 'faction') {
-                    const facId = findKeyword.toLowerCase().includes('horde') ? 1 : findKeyword.toLowerCase().includes('alliance') ? 2 : 0;
-                    if (facId) iconHtml = Icons.factionIcon(facId, 24);
+                    if (type === 'class') {
+                        const classId = Object.keys(Icons.classMap).find(id => findKeyword.includes(Icons.classMap[id]));
+                        if (classId) iconHtml = Icons.classIcon(classId, 24);
+                    } else if (type === 'race') {
+                        const raceId = Object.keys(Icons.raceIdToName).find(id => findKeyword.includes(Icons.raceIdToName[id]));
+                        if (raceId) iconHtml = Icons.raceIcon(raceId + '-0', 24);
+                    } else if (type === 'faction') {
+                        const facId = findKeyword.toLowerCase().includes('horde') ? 1 : findKeyword.toLowerCase().includes('alliance') ? 2 : 0;
+                        if (facId) iconHtml = Icons.factionIcon(facId, 24);
+                    }
                 }
 
                 innerHtml += `
                     <div class="tooltip-header">
                         ${iconHtml}
-                        <span class="tooltip-title">${title || Icons.getClassName(Object.keys(Icons.classMap).find(id => firstBody.includes(Icons.classMap[id]))) || (type === 'race' ? Object.values(Icons.raceIdToName).find(n => firstBody.includes(n)) : '') || ''}</span>
+                        <span class="tooltip-title">${title}</span>
                     </div>`;
             });
 
             innerHtml += '<div class="tooltip-body">';
             bodyLines.forEach((body, i) => {
-                const colors = tooltip.labelColors[i];
-                const span = `<span class="tooltip-marker" style="background:${colors.backgroundColor}; border-color:${colors.borderColor}"></span>`;
-                innerHtml += `<div class="tooltip-row">${span}${body}</div>`;
+                const lineText = String(body[0]);
+
+                if (type === 'faction-balance') {
+                    // Only process the win % line, skip area and balance mark
+                    if (lineText.includes('Horde Win %')) {
+                        const val = parseFloat(lineText.split(':')[1]);
+                        innerHtml += `
+                            <div class="tooltip-row">
+                                ${Icons.factionIcon(1, 16)} <span class="tooltip-label" style="margin-left:8px">Horde:</span> <span class="tooltip-value">${val.toFixed(1)}%</span>
+                            </div>
+                            <div class="tooltip-row">
+                                ${Icons.factionIcon(2, 16)} <span class="tooltip-label" style="margin-left:8px">Alliance:</span> <span class="tooltip-value">${(100 - val).toFixed(1)}%</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    const colors = tooltip.labelColors[i];
+                    const span = `<span class="tooltip-marker" style="background:${colors.backgroundColor}; border-color:${colors.borderColor}"></span>`;
+                    innerHtml += `<div class="tooltip-row">${span}${body}</div>`;
+                }
             });
             innerHtml += '</div></div>';
 
