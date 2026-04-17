@@ -306,8 +306,6 @@
                             <thead>
                                 <tr>
                                     <th>Player</th>
-                                    <th class="icon-col">Class</th>
-                                    <th class="icon-col">Race</th>
                                     <th>KB</th>
                                     <th>Deaths</th>
                                     <th>HK</th>
@@ -348,6 +346,81 @@
         <!-- TAB 3: MISC / ANALYTICS       -->
         <!-- ============================= -->
         <div class="tab-content" id="tab-misc">
+            <div class="analytics-landing" id="analytics-overview">
+                <!-- KPI Section -->
+                <div class="analytics-hero">
+                    <div class="hero-main">
+                        <h1>World Analytics</h1>
+                        <p id="latest-match-date">Data current as of February 16, 2026</p>
+                    </div>
+                    <div class="kpi-grid" id="analytics-kpis">
+                        <div class="kpi-card">
+                            <div class="kpi-value" id="stat-matches">—</div>
+                            <div class="kpi-label">Matches</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-value" id="stat-players">—</div>
+                            <div class="kpi-label">Unique Players</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-value" id="stat-damage">—</div>
+                            <div class="kpi-label">Damage Dealt</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-value" id="stat-healing">—</div>
+                            <div class="kpi-label">Healing Done</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faction Dominance -->
+                <div class="faction-dominance-card card">
+                    <div class="dominance-header">
+                        <h2>🏆 Faction Dominance</h2>
+                        <div class="dominance-stats">
+                            <span class="horde-wins" id="horde-global-wr">0%</span> vs <span class="alliance-wins" id="alliance-global-wr">0%</span>
+                        </div>
+                    </div>
+                    <div class="dominance-bar-container">
+                        <div class="dominance-bar-fill horde" id="horde-dominance-bar" style="width: 50%"></div>
+                        <div class="dominance-bar-fill alliance" id="alliance-dominance-bar" style="width: 50%"></div>
+                    </div>
+                    <div class="dominance-footer">
+                        <span>Horde Win Rate</span>
+                        <span>Alliance Win Rate</span>
+                    </div>
+                </div>
+
+                <!-- Insight Highlights -->
+                <div class="insight-highlights">
+                    <div class="card insight-card">
+                        <div class="insight-icon" id="insight-icon-class">⚔️</div>
+                        <div class="insight-content">
+                            <div class="insight-label">Meta Favorite</div>
+                            <div class="insight-value" id="insight-top-class">—</div>
+                        </div>
+                    </div>
+                    <div class="card insight-card">
+                        <div class="insight-icon" id="insight-icon-map">🗺️</div>
+                        <div class="insight-content">
+                            <div class="insight-label">Hottest Map</div>
+                            <div class="insight-value" id="insight-top-map">—</div>
+                        </div>
+                    </div>
+                    <div class="card insight-card">
+                        <div class="insight-icon" id="insight-icon-hks">💀</div>
+                        <div class="insight-content">
+                            <div class="insight-label">Total HKs</div>
+                            <div class="insight-value" id="stat-hks">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-divider">
+                    <span>Detailed Reports</span>
+                </div>
+            </div>
+
             <div class="dashboard">
                 <!-- Faction Dominance -->
                 <div class="card stat-card full-width">
@@ -420,6 +493,7 @@
                     <div class="chart-container">
                         <canvas id="classChart"></canvas>
                     </div>
+                    <div id="classChartLegend" class="html-legend-container"></div>
                 </div>
 
                 <!-- Avg Damage & Healing per Class -->
@@ -445,6 +519,36 @@
                     <p class="card-subtitle">Which classes end up on the winning team most often</p>
                     <div class="chart-container">
                         <canvas id="classWinRateChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- NEW: Race Analytics Section -->
+                <div class="analytics-divider full-width">
+                    <span>Race & Faction Expansion</span>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>🧬 Race Popularity</h2>
+                    <p class="card-subtitle">Server-wide distribution by race</p>
+                    <div class="chart-container">
+                        <canvas id="raceChart"></canvas>
+                    </div>
+                    <div id="raceChartLegend" class="html-legend-container"></div>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>⚔️ Race Win Rate %</h2>
+                    <p class="card-subtitle">Global win ratios by race (normalized)</p>
+                    <div class="chart-container">
+                        <canvas id="raceWinRateChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card full-width">
+                    <h2>📊 Faction Combat Breakdown</h2>
+                    <p class="card-subtitle">Aggregated performance: Horde vs Alliance</p>
+                    <div class="chart-container">
+                        <canvas id="factionCombatChart"></canvas>
                     </div>
                 </div>
             </div>

@@ -146,6 +146,7 @@ header h1 {
 header .highlight {
     background: linear-gradient(90deg, var(--horde-color), var(--alliance-color));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -1194,6 +1195,331 @@ footer a {
 
 footer a:hover {
     color: var(--text-color);
+}
+
+/* ==================== */
+/* Analytics Landing    */
+/* ==================== */
+
+.analytics-landing {
+    margin-bottom: 3rem;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.analytics-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.hero-main h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+    background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-main p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    flex: 1;
+    min-width: 600px;
+}
+
+.kpi-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.2rem;
+    border-radius: 16px;
+    text-align: center;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.kpi-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-3px);
+}
+
+.kpi-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.2rem;
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+}
+
+/* Faction Dominance Card */
+.faction-dominance-card {
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    background: radial-gradient(circle at top right, rgba(239, 68, 68, 0.05), transparent),
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.05), transparent),
+                var(--card-bg);
+}
+
+.dominance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dominance-stats {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+}
+
+.dominance-bar-container {
+    height: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 1rem;
+}
+
+.dominance-bar-fill {
+    height: 100%;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dominance-bar-fill.horde {
+    background: linear-gradient(90deg, #881337, var(--horde-color));
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.dominance-bar-fill.alliance {
+    background: linear-gradient(90deg, var(--alliance-color), #2563eb);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.dominance-footer {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Insight Cards */
+.insight-highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.insight-card {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.5rem;
+}
+
+.insight-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+.insight-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.2rem;
+}
+
+.insight-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.analytics-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.analytics-divider span {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+.analytics-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+}
+
+/* ==================== */
+/* Custom Tooltips      */
+/* ==================== */
+
+.chartjs-tooltip {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    pointer-events: none;
+    z-index: 9999;
+    padding: 12px !important;
+}
+
+.tooltip-container {
+    min-width: 140px;
+}
+
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.tooltip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* HTML Legend Stylings */
+.html-legend-container {
+    width: 100%;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.html-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.legend-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.legend-color-box {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+}
+
+.legend-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tooltip Consistency */
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.tooltip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.tooltip-row b {
+    color: #fff;
+    margin-left: auto;
+}
+
+.tooltip-marker {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* ==================== */
