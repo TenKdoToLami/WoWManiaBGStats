@@ -150,6 +150,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem 2rem;
+    width: 100%;
 }
 
 /* ==================== */
@@ -425,8 +426,8 @@ input[type="number"] {
 
 .dashboard {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
 }
 
 .card {
@@ -556,7 +557,7 @@ input[type="number"] {
 
 .chart-container {
     position: relative;
-    height: 300px;
+    height: 380px;
     width: 100%;
 }
 
@@ -1260,7 +1261,7 @@ footer a:hover {
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
