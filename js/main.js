@@ -39,12 +39,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const chartIconPlugin = {
         id: 'chartIconPlugin',
         afterDraw(chart, args, options) {
-            const { ctx, scales: { y } } = chart;
-            if (!y) return;
+            const { ctx, scales } = chart;
+            const isHorizontal = chart.options.indexAxis === 'y';
+            const scale = isHorizontal ? scales.y : scales.x;
+            if (!scale) return;
 
-            const ticks = y.getTicks();
-            ticks.forEach(async (tick, index) => {
-                const label = y.getLabelForValue(tick.value);
+            const ticks = scale.getTicks();
+            ticks.forEach((tick, index) => {
+                const label = scale.getLabelForValue(tick.value);
                 let iconPath = null;
 
                 if (options.type === 'class') {
@@ -53,16 +55,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else if (options.type === 'race') {
                     const raceId = Object.keys(Icons.raceIdToName).find(id => Icons.raceIdToName[id] === label);
                     if (raceId) iconPath = Icons.getRaceIconPath(raceId + '-0');
+                } else if (options.type === 'faction') {
+                    iconPath = label === 'Horde' ? 'img/horde_min.png' : 'img/alliance_min.png';
                 }
 
                 if (iconPath) {
-                    const img = await getIconImage(iconPath);
-                    if (img) {
-                        const yPos = y.getPixelForTick(index);
-                        ctx.font = y.options.ticks.font.string || '12px "Outfit", sans-serif';
-                        const labelWidth = ctx.measureText(label).width;
-                        const xPos = y.right - labelWidth - 32; 
-                        ctx.drawImage(img, xPos, yPos - 11, 22, 22);
+                    const img = iconImageCache[iconPath];
+                    if (img && img.complete) {
+                        const tickPos = scale.getPixelForTick(index);
+                        ctx.save();
+
+                        if (isHorizontal) {
+                            ctx.font = '12px "Outfit", sans-serif';
+                            const labelWidth = ctx.measureText(label).width;
+                            const xPos = scale.right - labelWidth - 32 - 15;
+                            const yPos = scale.getPixelForTick(index);
+                            ctx.drawImage(img, xPos, yPos - 15, 22, 22);
+                        } else {
+                            // Vertical mode (labels on bottom)
+                            const xPos = tickPos;
+                            const yPos = chart.chartArea.bottom + 6; // Between bars and text
+                            ctx.drawImage(img, xPos - 11, yPos, 22, 22);
+                        }
+
+                        ctx.restore();
+                    } else {
+                        getIconImage(iconPath).then(() => {
+                            if (!chart.animating) chart.draw();
+                        });
                     }
                 }
             });
@@ -91,11 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         minMatches: 50,
         mode: 'avg', // 'avg' or 'total'
         boards: {
-            active:  { offset: 0, limit: 15, exhausted: false },
-            damage:  { offset: 0, limit: 15, exhausted: false },
+            active: { offset: 0, limit: 15, exhausted: false },
+            damage: { offset: 0, limit: 15, exhausted: false },
             healing: { offset: 0, limit: 15, exhausted: false },
-            kb:      { offset: 0, limit: 15, exhausted: false },
-            hk:      { offset: 0, limit: 15, exhausted: false }
+            kb: { offset: 0, limit: 15, exhausted: false },
+            hk: { offset: 0, limit: 15, exhausted: false }
         }
     };
 
@@ -156,27 +176,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dataPromise = fetch("data/pvpstats.db").then(res => res.arrayBuffer());
 
         const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
-        
+
         const loaderSub = document.querySelector('.loader-subtext');
         if (loaderSub) loaderSub.innerText = "Parsing database into memory...";
-        
+
         db = new SQL.Database(new Uint8Array(buf));
 
         // Initial rendering
         if (loaderSub) loaderSub.innerText = "Rendering analytics & leaderboards...";
         renderAnalyticsLanding(db);
         renderOverview(db);
-        initLeaderboardListeners(db); 
-        renderAllLeaderboards(db);    
+        initLeaderboardListeners(db);
+        renderAllLeaderboards(db);
         renderRecentMatches(db);
 
         // Finalize
         if (loaderSub) loaderSub.innerText = "Dashboard Ready!";
-        
+
         setTimeout(() => {
             const overlay = document.getElementById('loading-overlay');
             const container = document.querySelector('.container');
-            
+
             if (overlay) overlay.classList.add('hidden');
             if (container) container.classList.add('loaded');
         }, 600);
@@ -328,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const h = Math.floor((seconds % (3600 * 24)) / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = Math.floor(seconds % 60);
-        
+
         let res = [];
         if (d > 0) res.push(`${d}d`);
         if (h > 0) res.push(`${h}h`);
@@ -365,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (statsRes.length === 0) return;
             const s = statsRes[0].values[0];
             const [totalMatches, wins, totalKb, totalHk, totalDeaths, totalDmg, totalHeal, totalHonor, rawTime] = s;
-            
+
             // FIX: Duration is stored in 60ths of a second (server ticks) or similar
             const totalTime = rawTime / 60;
             const losses = totalMatches - wins;
@@ -468,7 +488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const container = $(containerId);
         if (!container) return;
         container.innerHTML = '';
-        
+
         try {
             let query = '';
             if (type === 'map') {
@@ -1021,25 +1041,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const labels = values.map(d => {
                     const name = Icons.raceCodeToName(d[0]);
                     return name.replace(' Male', '').replace(' Female', '');
-                }); 
+                });
                 const counts = values.map(d => d[1]);
-                
+
                 const ctx = $('raceChart').getContext('2d');
                 const raceChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels,
-                        datasets: [{ 
-                            data: counts, 
+                        datasets: [{
+                            data: counts,
                             backgroundColor: labels.map(l => l === 'Human' || l === 'Night Elf' || l === 'Dwarf' || l === 'Gnome' || l === 'Draenei' || l === 'Worgen' ? '#3b82f6' : '#ef4444'),
-                            borderWidth: 0, 
-                            hoverOffset: 15 
+                            borderWidth: 0,
+                            hoverOffset: 15
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { 
+                        plugins: {
                             legend: { display: false },
                             tooltip: {
                                 enabled: false,
@@ -1071,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return name.replace(' Male', '').replace(' Female', '');
                 });
                 const wrData = values.map(d => ((d[2] / d[1]) * 100).toFixed(1));
-                
+
                 const ctx = $('raceWinRateChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -1087,10 +1107,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: { padding: { left: 35 } },
+                        layout: { padding: { left: 55 } },
                         scales: {
                             x: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 45, max: 60, ticks: { callback: v => v + '%' } },
-                            y: { 
+                            y: {
                                 grid: { display: false },
                                 ticks: { padding: 8 }
                             }
@@ -1125,10 +1145,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const values = res[0].values; // [[1, dmg, heal, hk], [2, dmg, heal, hk]]
             const factionLabels = ['Horde', 'Alliance'];
-            
+
             const dmgData = [values.find(v => v[0] === 1)[1], values.find(v => v[0] === 2)[1]];
             const healData = [values.find(v => v[0] === 1)[2], values.find(v => v[0] === 2)[2]];
-            
+
             const ctx = $('factionCombatChart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
@@ -1137,12 +1157,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     datasets: [
                         {
                             label: 'Total Damage', data: dmgData,
-                            backgroundColor: ['rgba(239, 68, 68, 0.8)', 'rgba(59, 130, 246, 0.8)'],
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1, borderRadius: 4,
                             yAxisID: 'y'
                         },
                         {
                             label: 'Total Healing', data: healData,
-                            backgroundColor: ['rgba(239, 68, 68, 0.4)', 'rgba(59, 130, 246, 0.4)'],
+                            backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1, borderRadius: 4,
                             yAxisID: 'y1'
                         }
                     ]
@@ -1150,15 +1174,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: { bottom: 35 } },
                     scales: {
                         y: { type: 'linear', position: 'left', grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Damage' } },
-                        y1: { type: 'linear', position: 'right', grid: { display: false }, title: { display: true, text: 'Healing' } }
+                        y1: { type: 'linear', position: 'right', grid: { display: false }, title: { display: true, text: 'Healing' } },
+                        x: { ticks: { padding: 28 } }
                     },
                     plugins: {
+                        legend: { position: 'top' },
                         tooltip: {
                             enabled: false,
                             external: (ctx) => externalTooltipHandler(ctx, 'faction')
-                        }
+                        },
+                        chartIconPlugin: { type: 'faction' }
                     }
                 }
             });
@@ -1229,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             title: { display: true, text: 'Matches', color: '#94a3b8' }
                         }
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { position: 'bottom' },
                         tooltip: {
                             enabled: false,
@@ -1391,7 +1419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } },
                         y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } }
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { position: 'bottom' },
                         tooltip: {
                             enabled: false,
@@ -1431,7 +1459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
+                    plugins: {
                         legend: { display: false },
                         tooltip: {
                             enabled: false,
@@ -1465,16 +1493,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: { bottom: 4 } },
                     scales: {
                         y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
-                        x: { grid: { display: false } }
+                        x: {
+                            grid: { display: false },
+                            ticks: { padding: 28 }
+                        }
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { position: 'bottom' },
                         tooltip: {
                             enabled: false,
                             external: (ctx) => externalTooltipHandler(ctx, 'class')
-                        }
+                        },
+                        chartIconPlugin: { type: 'class' }
                     }
                 }
             });
@@ -1513,10 +1546,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: { left: 35 } },
+                    layout: { padding: { left: 55 } },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true, ticks: { callback: v => v.toFixed(1) } },
-                        y: { 
+                        y: {
                             grid: { display: false },
                             ticks: { padding: 8 }
                         }
@@ -1568,10 +1601,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: { left: 35 } },
+                    layout: { padding: { left: 55 } },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 48, max: 58, ticks: { callback: v => v + '%' } },
-                        y: { 
+                        y: {
                             grid: { display: false },
                             ticks: { padding: 8 }
                         }
@@ -1622,7 +1655,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const [horde, alliance, total] = wrRes[0].values[0];
                 const hPct = (horde / total * 100).toFixed(1);
                 const aPct = (alliance / total * 100).toFixed(1);
-                
+
                 $('horde-global-wr').textContent = hPct + '%';
                 $('alliance-global-wr').textContent = aPct + '%';
                 $('horde-dominance-bar').style.width = hPct + '%';
@@ -1664,29 +1697,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ===================================
     // Utility & Tooltips
     // ===================================
-    
+
     function renderHtmlLegend(chart, containerId, type) {
         const container = $(containerId);
         if (!container) return;
-        
+
         const items = chart.options.plugins.legend.labels.generateLabels(chart);
         container.innerHTML = `<ul class="html-legend">
             ${items.map((item, index) => {
-                let iconHtml = '';
-                if (type === 'class') {
-                    const classId = Object.keys(Icons.classMap).find(id => Icons.classMap[id] === item.text);
-                    if (classId) iconHtml = Icons.classIcon(classId, 22);
-                } else if (type === 'race') {
-                    const raceId = Object.keys(Icons.raceIdToName).find(id => Icons.raceIdToName[id] === item.text);
-                    if (raceId) iconHtml = Icons.raceIcon(raceId + '-0', 22);
-                }
+            let iconHtml = '';
+            if (type === 'class') {
+                const classId = Object.keys(Icons.classMap).find(id => Icons.classMap[id] === item.text);
+                if (classId) iconHtml = Icons.classIcon(classId, 22);
+            } else if (type === 'race') {
+                const raceId = Object.keys(Icons.raceIdToName).find(id => Icons.raceIdToName[id] === item.text);
+                if (raceId) iconHtml = Icons.raceIcon(raceId + '-0', 22);
+            }
 
-                return `                    <li class="legend-item" data-index="${index}" style="opacity: ${item.hidden ? 0.3 : 1}">
+            return `                    <li class="legend-item" data-index="${index}" style="opacity: ${item.hidden ? 0.3 : 1}">
                         <div class="legend-color-box" style="background: ${item.fillStyle}; border-color: ${item.strokeStyle}"></div>
                         ${iconHtml}
                         <span class="legend-label">${item.text}</span>
                     </li>`;
-            }).join('')}
+        }).join('')}
         </ul>`;
 
         container.querySelectorAll('.legend-item').forEach(li => {
@@ -1717,7 +1750,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             titleLines.forEach(title => {
                 // Try to get icon for the title
                 let iconHtml = '';
-                
+
                 // For doughnut charts, the icon name might be in the first body line if title is empty
                 const firstBody = bodyLines.length > 0 ? String(bodyLines[0][0]) : '';
                 const findKeyword = (title + ' ' + firstBody);
@@ -1729,7 +1762,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const raceId = Object.keys(Icons.raceIdToName).find(id => findKeyword.includes(Icons.raceIdToName[id]));
                     if (raceId) iconHtml = Icons.raceIcon(raceId + '-0', 24);
                 } else if (type === 'faction') {
-                    const facId = findKeyword.includes('Horde') ? 1 : findKeyword.includes('Alliance') ? 2 : 0;
+                    const facId = findKeyword.toLowerCase().includes('horde') ? 1 : findKeyword.toLowerCase().includes('alliance') ? 2 : 0;
                     if (facId) iconHtml = Icons.factionIcon(facId, 24);
                 }
 

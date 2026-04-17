@@ -24,17 +24,17 @@ const WoWIcons = (() => {
     };
 
     const classColors = {
-        'Unknown':      '#808080',
-        'Warrior':      '#C79C6E',
-        'Paladin':      '#F58CBA',
-        'Hunter':       '#ABD473',
-        'Rogue':        '#FFF569',
-        'Priest':       '#FFFFFF',
+        'Unknown': '#808080',
+        'Warrior': '#C79C6E',
+        'Paladin': '#F58CBA',
+        'Hunter': '#ABD473',
+        'Rogue': '#FFF569',
+        'Priest': '#FFFFFF',
         'Death Knight': '#C41F3B',
-        'Shaman':       '#0070DE',
-        'Mage':         '#69CCF0',
-        'Warlock':      '#9482C9',
-        'Druid':        '#FF7D0A'
+        'Shaman': '#0070DE',
+        'Mage': '#69CCF0',
+        'Warlock': '#9482C9',
+        'Druid': '#FF7D0A'
     };
 
     // Class IDs that have icons in img/{id}.jpg
@@ -138,7 +138,7 @@ const WoWIcons = (() => {
     }
 
     function getClassIconPath(classId) {
-        if (classIconIds.includes(classId)) {
+        if (classIconIds.includes(parseInt(classId))) {
             return `img/${classId}.jpg`;
         }
         return null;
@@ -171,7 +171,7 @@ const WoWIcons = (() => {
     /** Returns an <img> HTML string for a faction icon */
     function factionIcon(factionId, size = 24) {
         if (factionId === 1) return `<img src="img/horde_min.png" alt="Horde" title="Horde" class="wow-icon faction-icon" style="width:${size}px;height:${size}px;" loading="lazy">`;
-        if (factionId === 2) return `<img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_tourn_crest_alliance.jpg" alt="Alliance" title="Alliance" class="wow-icon faction-icon" style="width:${size}px;height:${size}px;border-radius:4px" loading="lazy">`;
+        if (factionId === 2) return `<img src="img/alliance_min.png" alt="Alliance" title="Alliance" class="wow-icon faction-icon" style="width:${size}px;height:${size}px;" loading="lazy">`;
         return `<span class="icon-placeholder" style="width:${size}px;height:${size}px;">?</span>`;
     }
 
