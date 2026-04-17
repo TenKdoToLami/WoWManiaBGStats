@@ -97,7 +97,7 @@ def parse_html(html_content, bg_id):
         if tbody:
             for tr in tbody.find_all('tr'):
                 tds = tr.find_all('td')
-                if len(tds) < 10:
+                if len(tds) < 9:
                     continue
                 
                 # TD 0: Character and faction
@@ -143,7 +143,7 @@ def parse_html(html_content, bg_id):
                 damage = parse_int(tds[6].text)
                 healing = parse_int(tds[7].text)
                 attr1 = parse_int(tds[8].text)
-                attr2 = parse_int(tds[9].text)
+                attr2 = parse_int(tds[9].text) if len(tds) > 9 else 0
                 
                 player_data.append((bg_id, character, faction_id, class_id, race_code,
                                     kb, deaths, hk, bonus_honor, damage, healing, attr1, attr2))

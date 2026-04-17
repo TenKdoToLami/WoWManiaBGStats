@@ -182,96 +182,220 @@
                     </div>
                 </div>
                 <div class="leaderboard-grid">
+                    <!-- Row 1: Activity & Record -->
                     <div class="leaderboard-panel">
-                        <h3 class="leaderboard-title">
-                            <span class="lb-icon">⚔️</span> Most Matches
-                        </h3>
+                        <h3 class="leaderboard-title"><span class="lb-icon">⚔️</span> Most Matches</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-active">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Player</th>
-                                        <th>Matches</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>#</th><th>Player</th><th>Matches</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                         <button class="load-more-btn" data-board="active">Load more</button>
                     </div>
+                    <div class="leaderboard-panel" id="panel-wins">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🏆</span> Most Wins</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-wins">
+                                <thead><tr><th>#</th><th>Player</th><th>Wins</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="wins">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-losses">
+                        <h3 class="leaderboard-title"><span class="lb-icon">💀</span> Most Losses</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-losses">
+                                <thead><tr><th>#</th><th>Player</th><th>Losses</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="losses">Load more</button>
+                    </div>
+
+                    <!-- Row 2: Combat Basics -->
                     <div class="leaderboard-panel">
-                        <h3 class="leaderboard-title">
-                            <span class="lb-icon">💥</span> Top Damage
-                        </h3>
+                        <h3 class="leaderboard-title"><span class="lb-icon">⚡</span> Honorable Kills</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-hk">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg HK</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="hk">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🗡️</span> Killing Blows</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-kb">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg KB</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="kb">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-deaths">
+                        <h3 class="leaderboard-title"><span class="lb-icon">☠️</span> Deaths</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-deaths">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg Deaths</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="deaths">Load more</button>
+                    </div>
+
+                    <!-- Row 3: Output & Honor -->
+                    <div class="leaderboard-panel">
+                        <h3 class="leaderboard-title"><span class="lb-icon">💥</span> Damage</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-damage">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Player</th>
-                                        <th>Avg Damage</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>#</th><th>Player</th><th>Avg Damage</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                         <button class="load-more-btn" data-board="damage">Load more</button>
                     </div>
                     <div class="leaderboard-panel">
-                        <h3 class="leaderboard-title">
-                            <span class="lb-icon">💚</span> Top Healing
-                        </h3>
+                        <h3 class="leaderboard-title"><span class="lb-icon">💚</span> Healing</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-healing">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Player</th>
-                                        <th>Avg Healing</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>#</th><th>Player</th><th>Avg Healing</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
                         <button class="load-more-btn" data-board="healing">Load more</button>
                     </div>
-                    <div class="leaderboard-panel">
-                        <h3 class="leaderboard-title">
-                            <span class="lb-icon">🗡️</span> Top Killing Blows
-                        </h3>
+                    <div class="leaderboard-panel" id="panel-honor">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🏅</span> Bonus Honor</h3>
                         <div class="leaderboard-table-wrap">
-                            <table class="leaderboard-table" id="lb-kb">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Player</th>
-                                        <th>Avg KB</th>
-                                    </tr>
-                                </thead>
+                            <table class="leaderboard-table" id="lb-honor">
+                                <thead><tr><th>#</th><th>Player</th><th>Avg Honor</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
-                        <button class="load-more-btn" data-board="kb">Load more</button>
+                        <button class="load-more-btn" data-board="honor">Load more</button>
                     </div>
-                    <div class="leaderboard-panel">
-                        <h3 class="leaderboard-title">
-                            <span class="lb-icon">⚡</span> Top Honorable Kills
-                        </h3>
+
+                    <!-- Row 4: Warsong Gulch & AB -->
+                    <div class="leaderboard-panel" id="panel-wsg_caps">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🚩</span> WSG Flag Caps</h3>
                         <div class="leaderboard-table-wrap">
-                            <table class="leaderboard-table" id="lb-hk">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Player</th>
-                                        <th>Avg HK</th>
-                                    </tr>
-                                </thead>
+                            <table class="leaderboard-table" id="lb-wsg_caps">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Caps</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
-                        <button class="load-more-btn" data-board="hk">Load more</button>
+                        <button class="load-more-btn" data-board="wsg_caps">Load more</button>
                     </div>
+                    <div class="leaderboard-panel" id="panel-wsg_rets">
+                        <h3 class="leaderboard-title"><span class="lb-icon">↩️</span> WSG Flag Rets</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-wsg_rets">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Rets</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="wsg_rets">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-ab_aslt">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🏰</span> AB Bases Aslt</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-ab_aslt">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Aslt</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="ab_aslt">Load more</button>
+                    </div>
+
+                    <!-- Row 5: AB & AV -->
+                    <div class="leaderboard-panel" id="panel-ab_def">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🛡️</span> AB Bases Def</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-ab_def">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Def</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="ab_def">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-av_aslt">
+                        <h3 class="leaderboard-title"><span class="lb-icon">❄️</span> AV GVs Aslt</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-av_aslt">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Aslt</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="av_aslt">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-av_def">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🏛️</span> AV GVs Def</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-av_def">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Def</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="av_def">Load more</button>
+                    </div>
+
+                    <!-- Row 6: EotS & SotA -->
+                    <div class="leaderboard-panel" id="panel-eots_caps">
+                        <h3 class="leaderboard-title"><span class="lb-icon">⚡</span> EotS Flag Caps</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-eots_caps">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Caps</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="eots_caps">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-sota_demos">
+                        <h3 class="leaderboard-title"><span class="lb-icon">⚓</span> SotA Demos</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-sota_demos">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Demos</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="sota_demos">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-sota_gates">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🚪</span> SotA Gates</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-sota_gates">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Gates</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="sota_gates">Load more</button>
+                    </div>
+
+                    <!-- Row 7: IoC -->
+                    <div class="leaderboard-panel" id="panel-ioc_aslt">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🏗️</span> IoC Bases Aslt</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-ioc_aslt">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Aslt</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="ioc_aslt">Load more</button>
+                    </div>
+                    <div class="leaderboard-panel" id="panel-ioc_def">
+                        <h3 class="leaderboard-title"><span class="lb-icon">🏯</span> IoC Bases Def</h3>
+                        <div class="leaderboard-table-wrap">
+                            <table class="leaderboard-table" id="lb-ioc_def">
+                                <thead><tr><th>#</th><th>Player</th><th>Total Def</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="load-more-btn" data-board="ioc_def">Load more</button>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>

@@ -131,7 +131,7 @@ const WoWIcons = (() => {
         'Warsong Gulch': ['Flag Captures', 'Flag Returns'],
         'Arathi Basin': ['Bases Assaulted', 'Bases Defended'],
         'Alterac Valley': ['Graveyards Assaulted', 'Graveyards Defended'],
-        'Eye of the Storm': ['Flag Captures', 'Bases Defended'],
+        'Eye of the Storm': ['Flag Captures', '—'],
         'Strand of the Ancients': ['Demolishers Destroyed', 'Gates Destroyed'],
         'Isle of Conquest': ['Bases Assaulted', 'Bases Defended'],
         'Battle for Gilneas': ['Bases Assaulted', 'Bases Defended'],

@@ -112,10 +112,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         mode: 'avg', // 'avg' or 'total'
         boards: {
             active: { offset: 0, limit: 15, exhausted: false },
+            wins: { offset: 0, limit: 15, exhausted: false },
+            losses: { offset: 0, limit: 15, exhausted: false },
+            hk: { offset: 0, limit: 15, exhausted: false },
+            kb: { offset: 0, limit: 15, exhausted: false },
+            deaths: { offset: 0, limit: 15, exhausted: false },
             damage: { offset: 0, limit: 15, exhausted: false },
             healing: { offset: 0, limit: 15, exhausted: false },
-            kb: { offset: 0, limit: 15, exhausted: false },
-            hk: { offset: 0, limit: 15, exhausted: false }
+            honor: { offset: 0, limit: 15, exhausted: false },
+            wsg_caps: { offset: 0, limit: 15, exhausted: false },
+            wsg_rets: { offset: 0, limit: 15, exhausted: false },
+            ab_aslt: { offset: 0, limit: 15, exhausted: false },
+            ab_def: { offset: 0, limit: 15, exhausted: false },
+            av_aslt: { offset: 0, limit: 15, exhausted: false },
+            av_def: { offset: 0, limit: 15, exhausted: false },
+            eots_caps: { offset: 0, limit: 15, exhausted: false },
+            sota_demos: { offset: 0, limit: 15, exhausted: false },
+            sota_gates: { offset: 0, limit: 15, exhausted: false },
+            ioc_aslt: { offset: 0, limit: 15, exhausted: false },
+            ioc_def: { offset: 0, limit: 15, exhausted: false }
         }
     };
 
@@ -818,10 +833,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Update table header based on mode
             const th = panel.querySelector('thead th:last-child');
-            if (key !== 'active') {
-                const label = key === 'damage' ? 'Damage' :
-                    key === 'healing' ? 'Healing' :
-                        key === 'kb' ? 'KB' : 'HK';
+            const row1 = ['active', 'wins', 'losses'];
+            const boardLabels = {
+                active: 'Matches', wins: 'Wins', losses: 'Losses',
+                hk: 'HK', kb: 'KB', deaths: 'Deaths',
+                damage: 'Damage', healing: 'Healing', honor: 'Honor',
+                wsg_caps: 'Caps', wsg_rets: 'Rets', 
+                ab_aslt: 'Aslt', ab_def: 'Def',
+                av_aslt: 'GV Aslt', av_def: 'GV Def',
+                eots_caps: 'Caps',
+                sota_demos: 'Demos', sota_gates: 'Gates',
+                ioc_aslt: 'Aslt', ioc_def: 'Def'
+            };
+            const label = boardLabels[key] || key;
+
+            if (row1.includes(key)) {
+                th.innerText = label;
+            } else {
                 th.innerText = `${isAvg ? 'Avg' : 'Total'} ${label}`;
             }
 
@@ -838,6 +866,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Optimized subquery for main_class to avoid repeated scans
         const classSubquery = `(SELECT ps2.class_id FROM player_stats ps2 WHERE ps2.character_id = cm.id AND ps2.class_id > 0 GROUP BY ps2.class_id ORDER BY COUNT(*) DESC LIMIT 1)`;
 
+        const row1 = ['active', 'wins', 'losses'];
+        const isRow1 = row1.includes(key);
+        // Force Sum for row 1 even if global mode is Avg
+        const currentAgg = isRow1 ? 'SUM' : aggFunc;
+
         switch (key) {
             case 'active':
                 query = `
@@ -849,26 +882,79 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
                 `;
                 break;
-            case 'damage':
-            case 'healing':
+            case 'wins':
                 query = `
-                    SELECT cm.name, CAST(${aggFunc}(ps.${key}) AS INTEGER) as val, cm.id, ${classSubquery} as main_class
-                    FROM player_stats ps JOIN character_map cm ON ps.character_id = cm.id
-                    WHERE ps.class_id > 0 AND cm.name != 'Unknown' AND cm.id > 0
-                    GROUP BY ps.character_id HAVING COUNT(*) >= ${min}
+                    SELECT cm.name, SUM(CASE WHEN ps.faction_id = m.winner_id THEN 1 ELSE 0 END) as val, cm.id, ${classSubquery} as main_class
+                    FROM player_stats ps 
+                    JOIN matches m ON ps.match_id = m.id
+                    JOIN character_map cm ON ps.character_id = cm.id
+                    WHERE cm.id > 0 AND cm.name != 'Unknown'
+                    GROUP BY ps.character_id HAVING val >= ${min}
                     ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
                 `;
                 break;
+            case 'losses':
+                query = `
+                    SELECT cm.name, SUM(CASE WHEN m.winner_id > 0 AND ps.faction_id != m.winner_id THEN 1 ELSE 0 END) as val, cm.id, ${classSubquery} as main_class
+                    FROM player_stats ps 
+                    JOIN matches m ON ps.match_id = m.id
+                    JOIN character_map cm ON ps.character_id = cm.id
+                    WHERE cm.id > 0 AND cm.name != 'Unknown'
+                    GROUP BY ps.character_id HAVING val >= ${min}
+                    ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
+                `;
+                break;
+            case 'deaths':
+            case 'damage':
+            case 'healing':
             case 'kb':
             case 'hk':
+            case 'honor':
+                const field = key === 'honor' ? 'bonus_honor' : key;
                 query = `
-                    SELECT cm.name, CAST(${aggFunc}(ps.${key}) AS FLOAT) as val, cm.id, ${classSubquery} as main_class
+                    SELECT cm.name, CAST(${currentAgg}(ps.${field}) AS ${key === 'damage' || key === 'healing' ? 'INTEGER' : 'FLOAT'}) as val, cm.id, ${classSubquery} as main_class
                     FROM player_stats ps JOIN character_map cm ON ps.character_id = cm.id
                     WHERE ps.class_id > 0 AND cm.name != 'Unknown' AND cm.id > 0
                     GROUP BY ps.character_id HAVING COUNT(*) >= ${min}
                     ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
                 `;
-                formatter = v => isAvg ? v.toFixed(1) : v.toLocaleString();
+                formatter = v => (isAvg && !isRow1) ? v.toFixed(key === 'honor' || key === 'damage' ? 0 : 1) : Math.round(v).toLocaleString();
+                break;
+            case 'wsg_caps':
+            case 'wsg_rets':
+            case 'ab_aslt':
+            case 'ab_def':
+            case 'av_aslt':
+            case 'av_def':
+            case 'eots_caps':
+            case 'sota_demos':
+            case 'sota_gates':
+            case 'ioc_aslt':
+            case 'ioc_def':
+                let filter = "";
+                let col = "ps.attr1";
+                if (key === 'wsg_caps') { filter = "m.bg_id = 1"; }
+                else if (key === 'wsg_rets') { filter = "m.bg_id = 1"; col = "ps.attr2"; }
+                else if (key === 'ab_aslt') { filter = "m.bg_id = 2"; }
+                else if (key === 'ab_def') { filter = "m.bg_id = 2"; col = "ps.attr2"; }
+                else if (key === 'av_aslt') { filter = "m.bg_id = 3"; }
+                else if (key === 'av_def') { filter = "m.bg_id = 3"; col = "ps.attr2"; }
+                else if (key === 'eots_caps') { filter = "m.bg_id = 4"; }
+                else if (key === 'sota_demos') { filter = "m.bg_id = 5"; }
+                else if (key === 'sota_gates') { filter = "m.bg_id = 5"; col = "ps.attr2"; }
+                else if (key === 'ioc_aslt') { filter = "m.bg_id = 6"; }
+                else if (key === 'ioc_def') { filter = "m.bg_id = 6"; col = "ps.attr2"; }
+
+                query = `
+                    SELECT cm.name, CAST(${currentAgg}(${col}) AS FLOAT) as val, cm.id, ${classSubquery} as main_class
+                    FROM player_stats ps 
+                    JOIN matches m ON ps.match_id = m.id
+                    JOIN character_map cm ON ps.character_id = cm.id
+                    WHERE ${filter} AND cm.id > 0 AND cm.name != 'Unknown'
+                    GROUP BY ps.character_id HAVING val > 0
+                    ORDER BY val DESC LIMIT ${state.limit} OFFSET ${state.offset}
+                `;
+                formatter = v => (isAvg && !isRow1) ? v.toFixed(1) : Math.round(v).toLocaleString();
                 break;
         }
 
