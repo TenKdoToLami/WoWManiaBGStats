@@ -262,7 +262,7 @@ def db_writer(dynamic_mode=False):
         # Stopping mechanism for dynamic mode
         if dynamic_mode and running:
             # If our invalid IDs have pushed 100 entries beyond our last known success, assume dead end.
-            if max_invalid_id > latest_success_id + 100:
+            if max_invalid_id > latest_success_id + 10:
                 print(f"\n[AUTO-STOP] Hit a dead end 100 IDs past latest success ({latest_success_id}). Safely stopping!")
                 running = False
             
@@ -329,8 +329,8 @@ def start_scraper(start_id=None, end_id=None, threads=10):
     def wait_for_input():
         global running
         try:
-            sys.stdin.readline()
-            if running:
+            line = sys.stdin.readline()
+            if line != '' and running:
                 running = False
                 print("\n[STOP INITIATED] You pressed Enter. Safely shutting down... please wait.")
         except:

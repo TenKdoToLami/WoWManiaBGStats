@@ -1,0 +1,51 @@
+name: Weekly Match Data Update
+
+on:
+  schedule:
+    # Runs at 00:00 every Monday (UTC)
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+
+jobs:
+  update-database:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to push changes back to the repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Change if your project requires a specific version
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Scraper
+        # The script will now run in dynamic mode and find all new matches
+        run: python scraper.py
+
+      - name: Commit and Push changes
+        run: |
+          # Configure Git for the Actions bot
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Add the database file
+          git add data/pvpstats.db
+          
+          # Check if there are any changes to commit
+          if git diff --staged --quiet; then
+            echo "No new matches found. Database is up to date."
+          else
+            # Only commit and push if the database actually changed
+            git commit -m "Automated database update with new matches"
+            git push
+            echo "Successfully committed and pushed new match data."
+          fi
