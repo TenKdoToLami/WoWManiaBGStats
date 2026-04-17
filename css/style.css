@@ -781,6 +781,13 @@ input[type="number"] {
     font-size: 0.9rem;
 }
 
+.detail-item-objectives {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    font-weight: 400;
+}
+
 .detail-item-bar-bg {
     height: 8px;
     background: rgba(255, 255, 255, 0.05);

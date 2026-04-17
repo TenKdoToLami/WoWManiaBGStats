@@ -551,7 +551,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             let query = '';
             if (type === 'map') {
                 query = `
-                    SELECT bg.name, COUNT(*) as cnt
+                    SELECT bg.name, COUNT(*) as cnt, SUM(ps.attr1) as a1, SUM(ps.attr2) as a2
                     FROM player_stats ps
                     JOIN matches m ON ps.match_id = m.id
                     JOIN bg_map bg ON m.bg_id = bg.id
@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
             } else {
                 query = `
-                    SELECT br.name, COUNT(*) as cnt
+                    SELECT br.name, COUNT(*) as cnt, 0 as a1, 0 as a2
                     FROM player_stats ps
                     JOIN matches m ON ps.match_id = m.id
                     JOIN bracket_map br ON m.bracket_id = br.id
@@ -578,12 +578,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             container.innerHTML = rows.map(r => {
                 const name = r[0];
                 const count = r[1];
+                const a1 = r[2] || 0;
+                const a2 = r[3] || 0;
                 const pct = (count / max) * 100;
                 const icon = type === 'map' ? '🗺️' : '🏆';
+                
+                let objectiveHtml = '';
+                if (type === 'map' && (a1 > 0 || a2 > 0)) {
+                    objectiveHtml = `<div class="detail-item-objectives">${Icons.formatObjectives(name, a1, a2)} Total</div>`;
+                }
                 return `
                     <div class="detail-item">
                         <div class="detail-item-header">
-                            <span>${icon} ${name === '80' ? 'Level 80' : name}</span>
+                            <div>
+                                <span>${icon} ${name === '80' ? 'Level 80' : name}</span>
+                                ${objectiveHtml}
+                            </div>
                             <span>${count} matches</span>
                         </div>
                         <div class="detail-item-bar-bg">
