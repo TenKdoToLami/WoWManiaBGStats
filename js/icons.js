@@ -125,6 +125,59 @@ const WoWIcons = (() => {
     };
 
     // ===========================
+    // BG Attributes (Attr1 / Attr2 from game scoreboard)
+    // ===========================
+    const bgAttributes = {
+        'Warsong Gulch': ['Flag Captures', 'Flag Returns'],
+        'Arathi Basin': ['Bases Assaulted', 'Bases Defended'],
+        'Alterac Valley': ['Graveyards Assaulted', 'Graveyards Defended'],
+        'Eye of the Storm': ['Flag Captures', 'Bases Defended'],
+        'Strand of the Ancients': ['Demolishers Destroyed', 'Gates Destroyed'],
+        'Isle of Conquest': ['Bases Assaulted', 'Bases Defended'],
+        'Battle for Gilneas': ['Bases Assaulted', 'Bases Defended'],
+        'Twin Peaks': ['Flag Captures', 'Flag Returns']
+    };
+
+    /**
+     * Get attribute labels for a specific BG.
+     * Fallback to generic names if not mapped.
+     */
+    function getBgAttributes(fullName) {
+        return bgAttributes[fullName] || ['Objective 1', 'Objective 2'];
+    }
+
+    /**
+     * Get abbreviated term for column headers
+     */
+    function abbrevObjective(val) {
+        if (!val) return '';
+        if (val.includes('Captures')) return 'Caps';
+        if (val.includes('Returns')) return 'Rets';
+        if (val.includes('Assaulted')) return 'Aslt';
+        if (val.includes('Defended')) return 'Def';
+        if (val.includes('Destroyed') && val.includes('Demolishers')) return 'Demos';
+        if (val.includes('Destroyed') && val.includes('Gates')) return 'Gates';
+        // If neither, return the last word (e.g. "Points" from "Victory Points")
+        const words = val.split(' ');
+        return words.length > 1 ? words[1] : words[0];
+    }
+
+    /**
+     * Get a formatted short string for a player's objectives in a match
+     * e.g. "2 Caps, 1 Ret"
+     */
+    function formatObjectives(fullName, attr1, attr2) {
+        if (!attr1 && !attr2) return '—';
+        const attrs = getBgAttributes(fullName);
+        const parts = [];
+        
+        if (attr1 > 0) parts.push(`${attr1} ${abbrevObjective(attrs[0])}`);
+        if (attr2 > 0) parts.push(`${attr2} ${abbrevObjective(attrs[1])}`);
+        
+        return parts.length > 0 ? parts.join(', ') : '—';
+    }
+
+    // ===========================
     // Public API
     // ===========================
 
@@ -210,7 +263,8 @@ const WoWIcons = (() => {
         getClassName, getClassColor, getClassIconPath,
         classIcon, getRaceIconPath, raceIcon,
         factionIcon, getFactionColor, getFactionName,
-        getBgShortName, formatNumber, formatDuration
+        getBgShortName, formatNumber, formatDuration,
+        getBgAttributes, formatObjectives, abbrevObjective
     };
 
 })();

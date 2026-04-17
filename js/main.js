@@ -254,17 +254,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Try parsing correctly even if Safari/JS complains about SQLite space ' ' separator
                     let safeTimeStr = syncTime;
                     if (safeTimeStr.length === 19 && safeTimeStr.includes(' ')) {
-                        safeTimeStr = safeTimeStr.replace(' ', 'T'); 
+                        safeTimeStr = safeTimeStr.replace(' ', 'T');
                     }
-                    
+
                     const dateObj = new Date(safeTimeStr);
                     let dateStr = syncTime;
-                    
+
                     if (!isNaN(dateObj.getTime())) {
                         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
                         dateStr = dateObj.toLocaleDateString(undefined, options);
                     }
-                    
+
                     let html = `${label}<b>${dateStr}</b>`;
                     if (syncMatches > 0) {
                         html += `<span class="new-indicator" style="margin-left: 6px; color: var(--accent); font-size: 0.85em;">(+${syncMatches} New)</span>`;
@@ -709,7 +709,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = db.exec(`
                 SELECT m.date, bg.name, 
                        CASE WHEN ps.faction_id = m.winner_id THEN 1 ELSE 0 END as won,
-                       ps.damage, ps.healing, ps.kb, m.id
+                       ps.damage, ps.healing, ps.kb, m.id, ps.attr1, ps.attr2
                 FROM player_stats ps
                 JOIN matches m ON ps.match_id = m.id
                 JOIN bg_map bg ON m.bg_id = bg.id
@@ -720,7 +720,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const tbody = document.querySelector('#player-match-history tbody');
             tbody.innerHTML = res[0].values.map(r => {
-                const [date, bgName, won, dmg, heal, kb, matchId] = r;
+                const [date, bgName, won, dmg, heal, kb, matchId, attr1, attr2] = r;
                 return `
                     <tr class="clickable-match-row" data-match-id="${matchId}">
                         <td>${date}</td>
@@ -729,6 +729,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <td>${Icons.formatNumber(dmg)}</td>
                         <td>${Icons.formatNumber(heal)}</td>
                         <td>${kb}</td>
+                        <td style="color:var(--text-dim); font-size:0.85em;">${Icons.formatObjectives(bgName, attr1, attr2)}</td>
                     </tr>
                 `;
             }).join('');
@@ -951,6 +952,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const [id, bgName, bracket, winnerId, date, duration] = matchRes[0].values[0];
 
+            const attrs = Icons.getBgAttributes(bgName);
+            const thead = document.querySelector('#match-scoreboard thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Player</th>
+                    <th>KB</th>
+                    <th>Deaths</th>
+                    <th>HK</th>
+                    <th>Damage</th>
+                    <th>Healing</th>
+                    <th title="${attrs[0]}">${Icons.abbrevObjective(attrs[0])}</th>
+                    <th title="${attrs[1]}">${Icons.abbrevObjective(attrs[1])}</th>
+                    <th>Honor</th>
+                </tr>
+            `;
+
             $('match-detail-info').innerHTML = `
                 <h2>${Icons.factionIcon(winnerId, 28)} Match #${id}: ${bgName}</h2>
                 <div class="match-meta-row">
@@ -965,7 +982,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const playersRes = db.exec(`
                 SELECT cm.name, ps.faction_id, ps.class_id, rm.name as race_code,
                        ps.kb, ps.deaths, ps.hk, ps.bonus_honor, ps.damage, ps.healing,
-                       cm.id as char_id
+                       cm.id as char_id, ps.attr1, ps.attr2
                 FROM player_stats ps
                 LEFT JOIN character_map cm ON ps.character_id = cm.id
                 LEFT JOIN race_map rm ON ps.race_id = rm.id
@@ -985,11 +1002,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             let lastFaction = null;
 
             players.forEach(p => {
-                const [name, factionId, classId, raceCode, kb, deaths, hk, honor, dmg, heal, charId] = p;
+                const [name, factionId, classId, raceCode, kb, deaths, hk, honor, dmg, heal, charId, attr1, attr2] = p;
 
                 // Insert separator between factions
                 if (lastFaction !== null && lastFaction !== factionId) {
-                    html += `<tr class="faction-separator"><td colspan="9"></td></tr>`;
+                    html += `<tr class="faction-separator"><td colspan="11"></td></tr>`;
                 }
                 lastFaction = factionId;
 
@@ -1009,9 +1026,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <td>${kb}</td>
                         <td>${deaths}</td>
                         <td>${hk}</td>
-                        <td>${honor.toLocaleString()}</td>
                         <td>${dmg.toLocaleString()}</td>
                         <td>${heal.toLocaleString()}</td>
+                        <td>${attr1 || 0}</td>
+                        <td>${attr2 || 0}</td>
+                        <td>${honor.toLocaleString()}</td>
                     </tr>
                 `;
             });
