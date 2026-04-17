@@ -117,7 +117,12 @@ def parse_html(html_content, bg_id):
                 if len(imgs) >= 2:
                     src = imgs[1].get('src', '')
                     m = re.search(r'race/([^.]+)\.gif', src)
-                    if m: race_code = m.group(1)
+                    if m:
+                        raw_race = m.group(1)
+                        if '-' in raw_race:
+                            race_code = raw_race.split('-')[0] + '-0'
+                        else:
+                            race_code = raw_race + '-0'
                     
                 def parse_int(text):
                     try: return int(text.strip())

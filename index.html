@@ -415,16 +415,16 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="analytics-divider">
-                    <span>Detailed Reports</span>
-                </div>
             </div>
 
             <div class="dashboard">
-                <!-- Faction Dominance -->
+                <!-- GROUP 2: FACTION PERFORMANCE & BALANCE -->
+                <div class="analytics-divider full-width">
+                    <span>Faction Performance & Balance</span>
+                </div>
+
                 <div class="card stat-card full-width">
-                    <h2>Faction Dominance</h2>
+                    <h2>Total Faction Victory Counter</h2>
                     <div class="stat-content">
                         <div class="faction horde">
                             <img src="img/horde_min.png" alt="Horde">
@@ -434,9 +434,7 @@
                                 <span class="label">Wins</span>
                             </div>
                         </div>
-                        <div class="vs">
-                            <h2>VS</h2>
-                        </div>
+                        <div class="vs"><h2>VS</h2></div>
                         <div class="faction alliance">
                             <div class="faction-data right">
                                 <h3>Alliance</h3>
@@ -452,7 +450,35 @@
                     </div>
                 </div>
 
-                <!-- Server Activity Over Time -->
+                <div class="card chart-card full-width">
+                    <h2>📊 Faction Combat Breakdown</h2>
+                    <p class="card-subtitle">Aggregated performance: Horde vs Alliance total output</p>
+                    <div class="chart-container">
+                        <canvas id="factionCombatChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card full-width">
+                    <h2>🏰 Faction Win Rate per BG</h2>
+                    <p class="card-subtitle">Horde dominance varies wildly by map</p>
+                    <div class="chart-container">
+                        <canvas id="factionWinRateChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card full-width">
+                    <h2>⚖️ Faction Balance Over Time</h2>
+                    <p class="card-subtitle">Yearly Horde vs Alliance win percentage trends</p>
+                    <div class="chart-container">
+                        <canvas id="factionBalanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- GROUP 3: SERVER ACTIVITY & BATTLEGROUNDS -->
+                <div class="analytics-divider full-width">
+                    <span>Server Activity & Battlegrounds</span>
+                </div>
+
                 <div class="card chart-card full-width">
                     <h2>📈 Server Activity Over Time</h2>
                     <p class="card-subtitle">Monthly match volume — a decade of WoW-Mania PvP</p>
@@ -461,60 +487,37 @@
                     </div>
                 </div>
 
-                <!-- Faction Win Rate per BG -->
-                <div class="card chart-card">
-                    <h2>🏰 Faction Win Rate per BG</h2>
-                    <p class="card-subtitle">Horde dominance varies wildly by map</p>
-                    <div class="chart-container">
-                        <canvas id="factionWinRateChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Faction Balance Over Time -->
-                <div class="card chart-card">
-                    <h2>⚖️ Faction Balance Over Time</h2>
-                    <p class="card-subtitle">Yearly Horde vs Alliance win percentage</p>
-                    <div class="chart-container">
-                        <canvas id="factionBalanceChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- BG Wins Distribution -->
-                <div class="card chart-card">
-                    <h2>Battlegrounds Played & Win Rate</h2>
+                <div class="card chart-card full-width">
+                    <h2>🗺️ Battlegrounds Popularity & Win Rate</h2>
+                    <p class="card-subtitle">Distribution of matches played vs internal faction balance</p>
                     <div class="chart-container">
                         <canvas id="bgChart"></canvas>
                     </div>
                 </div>
 
-                <!-- Class Popularity -->
-                <div class="card chart-card">
-                    <h2>Class Popularity</h2>
+                <!-- GROUP 4: CLASS ANALYTICS -->
+                <div class="analytics-divider full-width">
+                    <span>Class Performance & Popularity</span>
+                </div>
+
+                <div class="card chart-card full-width">
+                    <h2>⚔️ Average Damage & Healing per Class</h2>
+                    <p class="card-subtitle">Which classes pump the highest numbers on average per match</p>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card full-width">
+                    <h2>🎭 Class Popularity</h2>
+                    <p class="card-subtitle">Distribution of characters seen across all battlegrounds</p>
                     <div class="chart-container">
                         <canvas id="classChart"></canvas>
                     </div>
                     <div id="classChartLegend" class="html-legend-container"></div>
                 </div>
 
-                <!-- Avg Damage & Healing per Class -->
                 <div class="card chart-card full-width">
-                    <h2>⚔️ Average Damage & Healing per Class</h2>
-                    <div class="chart-container">
-                        <canvas id="performanceChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- K/D Ratio by Class -->
-                <div class="card chart-card">
-                    <h2>💀 K/D Ratio by Class</h2>
-                    <p class="card-subtitle">Killing Blow to Death ratio — ranged DPS dominates</p>
-                    <div class="chart-container">
-                        <canvas id="kdChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Class Win Rate -->
-                <div class="card chart-card">
                     <h2>🏆 Class Win Rate</h2>
                     <p class="card-subtitle">Which classes end up on the winning team most often</p>
                     <div class="chart-container">
@@ -522,12 +525,20 @@
                     </div>
                 </div>
 
-                <!-- NEW: Race Analytics Section -->
-                <div class="analytics-divider full-width">
-                    <span>Race & Faction Expansion</span>
+                <div class="card chart-card full-width">
+                    <h2>💀 K/D Ratio by Class</h2>
+                    <p class="card-subtitle">Killing Blow to Death ratio — ranged DPS historically dominates</p>
+                    <div class="chart-container">
+                        <canvas id="kdChart"></canvas>
+                    </div>
                 </div>
 
-                <div class="card chart-card">
+                <!-- GROUP 5: RACE ANALYTICS -->
+                <div class="analytics-divider full-width">
+                    <span>Race Analytics</span>
+                </div>
+
+                <div class="card chart-card full-width">
                     <h2>🧬 Race Popularity</h2>
                     <p class="card-subtitle">Server-wide distribution by race</p>
                     <div class="chart-container">
@@ -536,19 +547,11 @@
                     <div id="raceChartLegend" class="html-legend-container"></div>
                 </div>
 
-                <div class="card chart-card">
+                <div class="card chart-card full-width">
                     <h2>⚔️ Race Win Rate %</h2>
-                    <p class="card-subtitle">Global win ratios by race (normalized)</p>
+                    <p class="card-subtitle">Global win ratios by race (normalized across all matches)</p>
                     <div class="chart-container">
                         <canvas id="raceWinRateChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="card chart-card full-width">
-                    <h2>📊 Faction Combat Breakdown</h2>
-                    <p class="card-subtitle">Aggregated performance: Horde vs Alliance</p>
-                    <div class="chart-container">
-                        <canvas id="factionCombatChart"></canvas>
                     </div>
                 </div>
             </div>

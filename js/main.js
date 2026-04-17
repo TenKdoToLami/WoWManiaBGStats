@@ -52,16 +52,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     iconPath = Icons.getClassIconPath(classId);
                 } else if (options.type === 'race') {
                     const raceId = Object.keys(Icons.raceIdToName).find(id => Icons.raceIdToName[id] === label);
-                    iconPath = Icons.getRaceIconPath(raceId + '-0');
+                    if (raceId) iconPath = Icons.getRaceIconPath(raceId + '-0');
                 }
 
                 if (iconPath) {
                     const img = await getIconImage(iconPath);
                     if (img) {
                         const yPos = y.getPixelForTick(index);
+                        ctx.font = y.options.ticks.font.string || '12px "Outfit", sans-serif';
                         const labelWidth = ctx.measureText(label).width;
-                        const xPos = y.right - labelWidth - (options.padding || 35); 
-                        ctx.drawImage(img, xPos, yPos - 12, 24, 24);
+                        const xPos = y.right - labelWidth - 32; 
+                        ctx.drawImage(img, xPos, yPos - 11, 22, 22);
                     }
                 }
             });
@@ -875,7 +876,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             $('match-detail-info').innerHTML = `
                 <h2>${Icons.factionIcon(winnerId, 28)} Match #${id}: ${bgName}</h2>
                 <div class="match-meta-row">
-                    <span class="match-meta-item">${Icons.factionIcon(winnerId, 18)} <strong>${Icons.getFactionName(winnerId)}</strong> Victory</span>
+                    <span class="match-meta-item">🏁 <strong>${Icons.getFactionName(winnerId)}</strong> Victory</span>
                     <span class="match-meta-item">🗓️ ${date}</span>
                     <span class="match-meta-item">⏱️ ${Icons.formatDuration(duration)}</span>
                     <span class="match-meta-item">🏟️ Bracket: ${bracket}</span>
@@ -1017,7 +1018,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             `);
             if (resPop.length > 0) {
                 const values = resPop[0].values;
-                const labels = values.map(d => Icons.raceCodeToName(d[0]).split(' ')[0]); // Get just Race name
+                const labels = values.map(d => {
+                    const name = Icons.raceCodeToName(d[0]);
+                    return name.replace(' Male', '').replace(' Female', '');
+                }); 
                 const counts = values.map(d => d[1]);
                 
                 const ctx = $('raceChart').getContext('2d');
@@ -1027,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         labels,
                         datasets: [{ 
                             data: counts, 
-                            backgroundColor: labels.map(l => l === 'Human' || l === 'Night' || l === 'Dwarf' || l === 'Gnome' || l === 'Draenei' || l === 'Worgen' ? '#3b82f6' : '#ef4444'),
+                            backgroundColor: labels.map(l => l === 'Human' || l === 'Night Elf' || l === 'Dwarf' || l === 'Gnome' || l === 'Draenei' || l === 'Worgen' ? '#3b82f6' : '#ef4444'),
                             borderWidth: 0, 
                             hoverOffset: 15 
                         }]
@@ -1062,7 +1066,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             `);
             if (resWR.length > 0) {
                 const values = resWR[0].values;
-                const labels = values.map(d => Icons.raceCodeToName(d[0]).split(' ')[0]);
+                const labels = values.map(d => {
+                    const name = Icons.raceCodeToName(d[0]);
+                    return name.replace(' Male', '').replace(' Female', '');
+                });
                 const wrData = values.map(d => ((d[2] / d[1]) * 100).toFixed(1));
                 
                 const ctx = $('raceWinRateChart').getContext('2d');
@@ -1072,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         labels,
                         datasets: [{
                             label: 'Win Rate %', data: wrData,
-                            backgroundColor: labels.map(l => l === 'Human' || l === 'Night' || l === 'Dwarf' || l === 'Gnome' || l === 'Draenei' || l === 'Worgen' ? 'rgba(59, 130, 246, 0.75)' : 'rgba(239, 68, 68, 0.75)'),
+                            backgroundColor: labels.map(l => l === 'Human' || l === 'Night Elf' || l === 'Dwarf' || l === 'Gnome' || l === 'Draenei' || l === 'Worgen' ? 'rgba(59, 130, 246, 0.75)' : 'rgba(239, 68, 68, 0.75)'),
                             borderWidth: 1, borderRadius: 6
                         }]
                     },
@@ -1080,9 +1087,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: { padding: { left: 35 } },
                         scales: {
                             x: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 45, max: 60, ticks: { callback: v => v + '%' } },
-                            y: { grid: { display: false } }
+                            y: { 
+                                grid: { display: false },
+                                ticks: { padding: 8 }
+                            }
                         },
                         plugins: {
                             legend: { display: false },
@@ -1502,9 +1513,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: { left: 35 } },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true, ticks: { callback: v => v.toFixed(1) } },
-                        y: { grid: { display: false } }
+                        y: { 
+                            grid: { display: false },
+                            ticks: { padding: 8 }
+                        }
                     },
                     plugins: {
                         legend: { display: false },
@@ -1553,9 +1568,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: { left: 35 } },
                     scales: {
                         x: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 48, max: 58, ticks: { callback: v => v + '%' } },
-                        y: { grid: { display: false } }
+                        y: { 
+                            grid: { display: false },
+                            ticks: { padding: 8 }
+                        }
                     },
                     plugins: {
                         legend: { display: false },
@@ -1635,7 +1654,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // 5. Total HKs
-            $('insight-icon-hks').innerHTML = `<img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_armornoble_a_01.jpg" style="width:36px;height:36px;border-radius:6px;">`;
+            $('insight-icon-hks').innerHTML = `<img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_armornoble_a_01.jpg" style="width:36px;height:36px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)">`;
 
         } catch (e) {
             console.error("Analytics Landing Error:", e);

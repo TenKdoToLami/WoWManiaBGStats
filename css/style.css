@@ -400,7 +400,7 @@ input[type="number"] {
 
 .dashboard {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 2rem;
 }
 
@@ -1232,10 +1232,9 @@ footer a:hover {
 
 .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     flex: 1;
-    min-width: 600px;
 }
 
 .kpi-card {
@@ -1325,7 +1324,7 @@ footer a:hover {
 /* Insight Cards */
 .insight-highlights {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-bottom: 3rem;
 }

@@ -94,8 +94,8 @@ const WoWIcons = (() => {
     const existingRaceIcons = new Set([
         '1-0', '1-1', '2-0', '2-1', '3-0', '3-1',
         '4-0', '4-1', '5-0', '5-1', '6-0', '6-1',
-        '7-0', '7-1', '8-0', '8-1',
-        '10-0', '10-1', '11-0', '11-1'
+        '7-0', '7-1', '8-0', '8-1', '9-0',
+        '10-0', '10-1', '11-0', '11-1', '12-0'
     ]);
 
     // ===========================
@@ -170,9 +170,8 @@ const WoWIcons = (() => {
 
     /** Returns an <img> HTML string for a faction icon */
     function factionIcon(factionId, size = 24) {
-        const name = factionMap[factionId] || 'Unknown';
         if (factionId === 1) return `<img src="img/horde_min.png" alt="Horde" title="Horde" class="wow-icon faction-icon" style="width:${size}px;height:${size}px;" loading="lazy">`;
-        if (factionId === 2) return `<img src="img/alliance_min.png" alt="Alliance" title="Alliance" class="wow-icon faction-icon" style="width:${size}px;height:${size}px;" loading="lazy">`;
+        if (factionId === 2) return `<img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_tourn_crest_alliance.jpg" alt="Alliance" title="Alliance" class="wow-icon faction-icon" style="width:${size}px;height:${size}px;border-radius:4px" loading="lazy">`;
         return `<span class="icon-placeholder" style="width:${size}px;height:${size}px;">?</span>`;
     }
 
