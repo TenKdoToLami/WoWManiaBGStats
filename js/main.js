@@ -543,7 +543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function loadPlayerProfile(charId) {
-        if (!db) return;
+        if (!db || isNaN(charId)) return;
         try {
             // Get player name
             const nameRes = db.exec(`SELECT name FROM character_map WHERE id = ${charId}`);
@@ -928,8 +928,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const labels = history.map((_, i) => i + 1);
-        const data = history.map(h => h[1]); // [match_id, rating]
+        const labels = history.map(h => {
+            if (typeof h[0] !== 'string') return `Match #${h[0]}`;
+            const parts = h[0].split('-'); // YYYY-MM-DD
+            if (parts.length !== 3) return h[0];
+            return `${parseInt(parts[1])}/${parseInt(parts[2])}/${parts[0]}`; // M/D/YYYY
+        });
+        const data = history.map(h => h[1]);   // rating
         
         const mainColor = '#8b5cf6'; // Default Diamond/Purple feel
 
@@ -943,9 +948,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     borderColor: mainColor,
                     backgroundColor: mainColor + '11',
                     borderWidth: 3,
-                    pointRadius: 4,
+                    pointRadius: history.length > 50 ? 0 : 4,
                     pointHoverRadius: 6,
-                    tension: 0.3,
+                    tension: 0.1,
                     fill: true
                 }]
             },
@@ -955,13 +960,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 scales: {
                     x: {
                         display: true,
-                        title: { display: true, text: 'Matches Played', color: '#94a3b8' },
-                        grid: { display: false }
+                        title: { display: true, text: 'Match Date', color: '#94a3b8' },
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 45,
+                            autoSkip: true,
+                            maxTicksLimit: 8,
+                            color: '#64748b',
+                            font: { size: 10 }
+                        }
                     },
                     y: {
                         display: true,
                         title: { display: true, text: 'ELO Rating', color: '#94a3b8' },
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#64748b' }
                     }
                 },
                 plugins: {
@@ -970,7 +983,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         mode: 'index',
                         intersect: false,
                         callbacks: {
-                            title: (items) => `Match #${items[0].label}`,
+                            title: (items) => `Date: ${items[0].label}`,
                             label: (item) => ` Rating: ${Math.round(item.raw)}`
                         }
                     }
@@ -2552,7 +2565,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const rClass = rank <= 3 ? ` rank-${rank}` : '';
 
                 return `
-                    <tr class="clickable-match-row" data-name="${d.name}">
+                    <tr class="clickable-match-row" data-char-id="${d.charId}" data-name="${d.name}">
                         <td class="rank-cell${rClass}" style="width: 50px; text-align: center; font-weight: bold; ${rank === 1 ? 'color:#fbbf24' : rank === 2 ? 'color:#94a3b8' : rank === 3 ? 'color:#cd7f32' : 'color:var(--text-dim)'}">${rank}</td>
                         <td style="display: flex; align-items: center; gap: 0.7rem; font-weight: 600;">
                             ${Icons.classIcon(d.classId, 22)}

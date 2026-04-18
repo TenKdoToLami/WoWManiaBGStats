@@ -24,7 +24,7 @@ import time
 
 DB_PATH = "data/pvpstats.db"
 START_RATING = 1500.0
-HISTORY_LENGTH = 50  # Keep last N rating snapshots per player
+HISTORY_LENGTH = 2000  # Increased limit to show full attendance history
 
 
 def get_k_factor(matches_played):
@@ -157,8 +157,8 @@ def calculate_elo():
             if p['rating'] > p['peak']:
                 p['peak'] = p['rating']
             p['last_date'] = match_date
-            # Store history snapshot (keep last N)
-            p['history'].append([match_id, round(p['rating'], 1)])
+            # Store history snapshot (date, rating)
+            p['history'].append([match_date, round(p['rating'], 1)])
             if len(p['history']) > HISTORY_LENGTH:
                 p['history'] = p['history'][-HISTORY_LENGTH:]
 
@@ -174,7 +174,8 @@ def calculate_elo():
             if p['rating'] > p['peak']:
                 p['peak'] = p['rating']
             p['last_date'] = match_date
-            p['history'].append([match_id, round(p['rating'], 1)])
+            # Store history snapshot (date, rating)
+            p['history'].append([match_date, round(p['rating'], 1)])
             if len(p['history']) > HISTORY_LENGTH:
                 p['history'] = p['history'][-HISTORY_LENGTH:]
 
@@ -217,7 +218,14 @@ def calculate_elo():
         "INSERT INTO elo_ratings VALUES (?, ?, ?, ?, ?, ?, ?)",
         rows
     )
+    
+    # Final cleanup to ensure no WAL files remain and DB is optimized
+    print("Finalizing database...")
+    c.execute("PRAGMA journal_mode=DELETE")
+    c.execute("VACUUM")
+
     conn.commit()
+    conn.close()
 
     # Print summary statistics
     ratings = [p['rating'] for p in players.values()]
