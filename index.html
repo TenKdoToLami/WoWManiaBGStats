@@ -7,7 +7,9 @@
     <title>WoW-Mania BG Analytics</title>
     <meta name="description"
         content="Comprehensive PvP battleground analytics for WoW-Mania — tracking 27,000+ matches and 380,000+ player records from 2015 to 2026.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,7 +31,8 @@
         <header>
             <h1><span class="highlight">WoW-Mania</span> Battleground Analytics</h1>
             <p>Data scraped directly from WoW-Mania PvP rankings. Tracking <span id="total-matches">...</span> matches
-                and <span id="total-players">...</span> unique characters. <span id="sync-status" class="sync-badge">—</span></p>
+                and <span id="total-players">...</span> unique characters. <span id="sync-status"
+                    class="sync-badge">—</span></p>
         </header>
 
         <!-- Tab Navigation -->
@@ -45,6 +48,11 @@
             <button class="tab-btn" data-tab="misc" id="tab-btn-misc">
                 <img src="img/alliance_min.png" alt="" class="tab-icon">
                 <span>Analytics</span>
+            </button>
+            <button class="tab-btn" data-tab="elo" id="tab-btn-elo">
+                <span class="tab-icon"
+                    style="font-size:1.5rem; display:flex; align-items:center; justify-content:center; filter:none; margin:0;">⚔️</span>
+                <span>ELO Rankings</span>
             </button>
         </nav>
 
@@ -222,7 +230,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">⚔️</span> Most Matches</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-active">
-                                <thead><tr><th>#</th><th>Player</th><th>Matches</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Matches</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -232,7 +246,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🏆</span> Most Wins</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-wins">
-                                <thead><tr><th>#</th><th>Player</th><th>Wins</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Wins</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -242,7 +262,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">💀</span> Most Losses</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-losses">
-                                <thead><tr><th>#</th><th>Player</th><th>Losses</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Losses</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -254,7 +280,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">⚡</span> Honorable Kills</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-hk">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg HK</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg HK</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -264,7 +296,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🗡️</span> Killing Blows</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-kb">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg KB</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg KB</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -274,7 +312,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">☠️</span> Deaths</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-deaths">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg Deaths</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg Deaths</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -286,7 +330,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">💥</span> Damage</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-damage">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg Damage</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg Damage</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -296,7 +346,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">💚</span> Healing</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-healing">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg Healing</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg Healing</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -306,7 +362,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🏅</span> Bonus Honor</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-honor">
-                                <thead><tr><th>#</th><th>Player</th><th>Avg Honor</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Avg Honor</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -318,7 +380,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🚩</span> WSG Flag Caps</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-wsg_caps">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Caps</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Caps</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -328,7 +396,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">↩️</span> WSG Flag Rets</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-wsg_rets">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Rets</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Rets</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -338,7 +412,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🏰</span> AB Bases Aslt</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-ab_aslt">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Aslt</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Aslt</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -350,7 +430,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🛡️</span> AB Bases Def</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-ab_def">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Def</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Def</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -360,7 +446,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">❄️</span> AV GVs Aslt</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-av_aslt">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Aslt</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Aslt</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -370,7 +462,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🏛️</span> AV GVs Def</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-av_def">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Def</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Def</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -382,7 +480,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">⚡</span> EotS Flag Caps</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-eots_caps">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Caps</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Caps</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -392,7 +496,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">⚓</span> SotA Demos</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-sota_demos">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Demos</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Demos</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -402,7 +512,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🚪</span> SotA Gates</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-sota_gates">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Gates</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Gates</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -414,7 +530,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🏗️</span> IoC Bases Aslt</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-ioc_aslt">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Aslt</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Aslt</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -424,7 +546,13 @@
                         <h3 class="leaderboard-title"><span class="lb-icon">🏯</span> IoC Bases Def</h3>
                         <div class="leaderboard-table-wrap">
                             <table class="leaderboard-table" id="lb-ioc_def">
-                                <thead><tr><th>#</th><th>Player</th><th>Total Def</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <th>Total Def</th>
+                                    </tr>
+                                </thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -541,7 +669,8 @@
                         </div>
                         <div class="dominance-bar-container">
                             <div class="dominance-bar-fill horde" id="horde-dominance-bar" style="width: 50%"></div>
-                            <div class="dominance-bar-fill alliance" id="alliance-dominance-bar" style="width: 50%"></div>
+                            <div class="dominance-bar-fill alliance" id="alliance-dominance-bar" style="width: 50%">
+                            </div>
                         </div>
                         <div class="dominance-footer">
                             <span>Horde Win Rate</span>
@@ -718,6 +847,121 @@
             </div>
         </div>
 
+        <!-- TAB 4: ELO RANKINGS -->
+        <div class="tab-content" id="tab-elo">
+            <div class="elo-hero" style="text-align: center; padding: 3rem 0 2rem;">
+                <h1
+                    style="font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 900; margin: 0; background: linear-gradient(135deg, #f59e0b, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    ⚔️ ELO Rankings</h1>
+                <p class="subtitle" style="color: var(--text-dim); margin-top: 0.5rem;">Player skill ratings calculated
+                    from <span id="elo-total-matches">—</span> level 80 battleground matches</p>
+            </div>
+
+            <!-- Rating Tier Legend -->
+            <div class="rating-tier-legend"
+                style="display: flex; gap: 1.5rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap;">
+                <div class="tier-item"
+                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #ef4444;"></div>
+                    &lt;1400 · Iron
+                </div>
+                <div class="tier-item"
+                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #94a3b8;"></div>
+                    1400–1600 · Silver
+                </div>
+                <div class="tier-item"
+                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #10b981;"></div>
+                    1600–1800 · Gold
+                </div>
+                <div class="tier-item"
+                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #8b5cf6;"></div>
+                    1800–2200 · Diamond
+                </div>
+                <div class="tier-item"
+                    style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #f59e0b;"></div>
+                    2200+ · Legendary
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="elo-stats-row kpi-grid" id="elo-stats-row" style="margin-bottom: 2rem;">
+                <!-- Injected -->
+            </div>
+
+            <!-- Charts -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;"
+                class="elo-charts-grid">
+                <div class="card chart-card">
+                    <h3>📊 Rating Distribution</h3>
+                    <div class="chart-container chart-sm">
+                        <canvas id="ratingDistChart"></canvas>
+                    </div>
+                </div>
+                <div class="card chart-card">
+                    <h3>🏆 Top 15 Ratings</h3>
+                    <div class="chart-container chart-sm">
+                        <canvas id="topRatingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="elo-toolbar"
+                style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <input type="text" class="search-input" id="elo-search" placeholder="Search player..."
+                    style="flex: 1; min-width: 200px; max-width: 350px;">
+                <div class="elo-filters" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span
+                        style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 600;">Min
+                        Matches:</span>
+                    <div class="filter-pills" id="elo-min-pills">
+                        <button class="filter-pill" data-min="1">1</button>
+                        <button class="filter-pill" data-min="10">10</button>
+                        <button class="filter-pill active" data-min="25">25</button>
+                        <button class="filter-pill" data-min="50">50</button>
+                        <button class="filter-pill" data-min="100">100</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Table -->
+            <div class="leaderboard-table-wrap" id="elo-table-wrap">
+                <div class="elo-loading" id="elo-loading"
+                    style="text-align: center; padding: 4rem 2rem; color: var(--text-dim);">
+                    <p>Loading ELO data...</p>
+                </div>
+                <table class="leaderboard-table elo-table" id="elo-table" style="display:none; width:100%;">
+                    <thead>
+                        <tr>
+                            <th data-sort="rank" style="cursor:pointer"># <span class="sort-arrow">▼</span></th>
+                            <th data-sort="name" style="cursor:pointer">Player <span class="sort-arrow">▼</span></th>
+                            <th data-sort="rating" class="sorted" style="cursor:pointer">Rating <span
+                                    class="sort-arrow">▼</span></th>
+                            <th data-sort="peak" style="cursor:pointer">Peak <span class="sort-arrow">▼</span></th>
+                            <th data-sort="matches" style="cursor:pointer">Matches <span class="sort-arrow">▼</span>
+                            </th>
+                            <th data-sort="winrate" style="cursor:pointer">Win % <span class="sort-arrow">▼</span></th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="elo-tbody"></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div id="elo-pagination"
+                style="display:none; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 1.5rem;">
+                <button id="elo-prev" class="filter-pill">← Prev</button>
+                <span class="page-info" id="elo-page-info"
+                    style="font-size: 0.82rem; color: var(--text-dim); padding: 0 1rem;">Page 1</span>
+                <button id="elo-next" class="filter-pill">Next →</button>
+            </div>
+        </div>
+
         <footer>
             <p>Data sourced from <a href="https://wow-mania.org" target="_blank" rel="noopener">wow-mania.org</a> PvP
                 statistics. Dashboard built with Chart.js & sql.js.</p>
@@ -727,8 +971,8 @@
     <!-- Scroll-to-top button -->
     <button class="scroll-to-top" id="scroll-to-top" title="Back to top">↑</button>
 
-    <script src="js/icons.js?v=5"></script>
-    <script src="js/main.js?v=5"></script>
+    <script src="js/icons.js?v=7"></script>
+    <script src="js/main.js?v=7"></script>
 </body>
 
 </html>

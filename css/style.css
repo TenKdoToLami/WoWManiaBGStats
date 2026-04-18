@@ -416,6 +416,17 @@ header p {
     filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.4));
 }
 
+/* ELO Rankings link tab */
+a.tab-btn-link {
+    text-decoration: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+    margin-left: 0.5rem;
+}
+
+a.tab-btn-link:hover {
+    color: #f59e0b;
+}
+
 /* ==================== */
 /* Tab Content          */
 /* ==================== */

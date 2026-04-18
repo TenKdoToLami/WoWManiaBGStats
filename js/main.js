@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     let miscInitialized = false;
+    let eloInitialized = false;
 
     function switchTab(tabName) {
         tabBtns.forEach(b => {
@@ -171,6 +172,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             initMiscCharts(db);
         }
 
+        // Lazy-init ELO tab on first visit
+        if (tabName === 'elo' && !eloInitialized && db) {
+            eloInitialized = true;
+            initEloTab(db);
+        }
+
         // Update hash
         window.location.hash = tabName;
     }
@@ -181,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Restore tab from hash
     const hashTab = window.location.hash.replace('#', '');
-    if (['players', 'matches', 'misc'].includes(hashTab)) {
+    if (['players', 'matches', 'misc', 'elo'].includes(hashTab)) {
         switchTab(hashTab);
     }
 
@@ -194,8 +201,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sqlPromise = initSqlJs({
             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
-        // GitHub Pages CDN handles cache invalidation on push — no cache buster needed
-        const dataPromise = fetch("data/pvpstats.db").then(res => res.arrayBuffer());
+
+        // Force cache-buster so we don't hit "no such table" errors if the db updates
+        const dbUrl = `data/pvpstats_temp.db?t=${Date.now()}`;
+        const dataPromise = fetch(dbUrl).then(res => res.arrayBuffer());
 
         const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
 
@@ -2283,6 +2292,269 @@ document.addEventListener('DOMContentLoaded', async () => {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    }
+
+    // ===================================
+    // ELO RANKINGS TAB LOGIC
+    // ===================================
+    function initEloTab(dbInstance) {
+        let allData = [];
+        let filteredData = [];
+        let sortKey = 'rating';
+        let sortDir = 'desc';
+        let currentPage = 0;
+        const PAGE_SIZE = 50;
+        let minMatches = 25;
+        let searchQuery = '';
+
+        function getRatingColor(rating) {
+            if (rating >= 2200) return '#f59e0b';
+            if (rating >= 1800) return '#8b5cf6';
+            if (rating >= 1600) return '#10b981';
+            if (rating >= 1400) return '#94a3b8';
+            return '#ef4444';
+        }
+
+        function getRatingTier(rating) {
+            if (rating >= 2200) return 'Legendary';
+            if (rating >= 1800) return 'Diamond';
+            if (rating >= 1600) return 'Gold';
+            if (rating >= 1400) return 'Silver';
+            return 'Iron';
+        }
+
+        try {
+            const res = dbInstance.exec(`
+                SELECT e.character_id, cm.name, e.rating, e.peak_rating, 
+                       e.matches_played, e.wins, e.rating_history
+                FROM elo_ratings e
+                JOIN character_map cm ON e.character_id = cm.id
+                ORDER BY e.rating DESC
+            `);
+
+            if (res.length === 0) {
+                $('elo-loading').innerHTML = '<p>No ELO data found. Run elo_calculator.py first.</p>';
+                return;
+            }
+
+            const classRes = dbInstance.exec(`
+                SELECT ps.character_id, ps.class_id, COUNT(*) as cnt
+                FROM player_stats ps
+                JOIN matches m ON ps.match_id = m.id
+                WHERE m.bracket_id = (SELECT id FROM bracket_map WHERE name = '80')
+                AND ps.class_id > 0
+                GROUP BY ps.character_id, ps.class_id
+            `);
+
+            const classMap = {};
+            if (classRes.length > 0) {
+                const classCounts = {};
+                for (const row of classRes[0].values) {
+                    const [charId, classId, cnt] = row;
+                    if (!classCounts[charId] || cnt > classCounts[charId].cnt) {
+                        classCounts[charId] = { classId, cnt };
+                    }
+                }
+                for (const [charId, info] of Object.entries(classCounts)) {
+                    classMap[charId] = info.classId;
+                }
+            }
+
+            allData = res[0].values.map((row) => {
+                const [charId, name, rating, peak, matches, wins, historyJson] = row;
+                let history = [];
+                try { history = JSON.parse(historyJson || '[]'); } catch (e) { }
+                return {
+                    charId, name, classId: classMap[charId] || 0,
+                    rating: Math.round(rating), peak: Math.round(peak),
+                    matches, wins,
+                    winrate: matches > 0 ? (wins / matches * 100) : 0,
+                    history
+                };
+            });
+
+            const totalRes = dbInstance.exec("SELECT COUNT(*) FROM matches WHERE bracket_id = (SELECT id FROM bracket_map WHERE name = '80')");
+            const totalMatches = totalRes.length > 0 ? totalRes[0].values[0][0] : 0;
+            $('elo-total-matches').textContent = totalMatches.toLocaleString();
+
+        } catch (e) {
+            $('elo-loading').innerHTML = `<p style="color:#ef4444;">Error querying data: ${e.message}</p>`;
+            return;
+        }
+
+        function renderStats() {
+            const ratings = allData.filter(d => d.matches >= 10).map(d => d.rating).sort((a, b) => a - b);
+            const tiers = { Iron: 0, Silver: 0, Gold: 0, Diamond: 0, Legendary: 0 };
+            for (const r of ratings) tiers[getRatingTier(r)]++;
+
+            $('elo-stats-row').innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-value">${allData.length.toLocaleString()}</div>
+                    <div class="kpi-label">Rated Players</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value" style="color:#f59e0b;">${tiers.Legendary + tiers.Diamond}</div>
+                    <div class="kpi-label">Diamond+ Players</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value">${ratings.length > 0 ? ratings[Math.floor(ratings.length / 2)] : '—'}</div>
+                    <div class="kpi-label">Median Rating</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value" style="color:#f59e0b;">${allData.length > 0 ? allData[0].rating : '—'}</div>
+                    <div class="kpi-label">Highest Rating</div>
+                </div>
+            `;
+        }
+
+        function renderCharts() {
+            const ratings = allData.filter(d => d.matches >= 10).map(d => d.rating);
+            const bucketSize = 50;
+            const minR = Math.floor(Math.min(...ratings) / bucketSize) * bucketSize;
+            const maxR = Math.ceil(Math.max(...ratings) / bucketSize) * bucketSize;
+            const buckets = {};
+            for (let r = minR; r <= maxR; r += bucketSize) buckets[r] = 0;
+            for (const r of ratings) buckets[Math.floor(r / bucketSize) * bucketSize]++;
+
+            const labels = Object.keys(buckets).map(Number).sort((a, b) => a - b);
+            const data = labels.map(l => buckets[l]);
+            const colors = labels.map(l => getRatingColor(l + bucketSize / 2));
+
+            new Chart($('ratingDistChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels.map(String),
+                    datasets: [{
+                        data, backgroundColor: colors.map(c => c + '99'),
+                        borderColor: colors, borderWidth: 1, borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { x: { grid: { display: false } }, y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const top15 = allData.slice(0, 15);
+            new Chart($('topRatingsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: top15.map(d => d.name),
+                    datasets: [{
+                        data: top15.map(d => d.rating),
+                        backgroundColor: top15.map(d => getRatingColor(d.rating) + '99'),
+                        borderColor: top15.map(d => getRatingColor(d.rating)), borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    scales: { x: { min: 1200 }, y: { grid: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderTable() {
+            const start = currentPage * PAGE_SIZE;
+            const page = filteredData.slice(start, start + PAGE_SIZE);
+
+            $('elo-tbody').innerHTML = page.map((d, i) => {
+                const rank = start + i + 1;
+                const rColor = getRatingColor(d.rating);
+                const wColor = d.winrate >= 55 ? 'var(--accent)' : d.winrate >= 45 ? 'var(--accent-warm)' : 'var(--horde-color)';
+                const rClass = rank <= 3 ? ` rank-${rank}` : '';
+
+                return `
+                    <tr class="clickable-match-row" data-name="${d.name}">
+                        <td class="rank-cell${rClass}" style="width: 50px; text-align: center; font-weight: bold; ${rank === 1 ? 'color:#fbbf24' : rank === 2 ? 'color:#94a3b8' : rank === 3 ? 'color:#cd7f32' : 'color:var(--text-dim)'}">${rank}</td>
+                        <td style="display: flex; align-items: center; gap: 0.7rem; font-weight: 600;">
+                            ${Icons.classIcon(d.classId, 22)}
+                            <span style="color:${Icons.getClassColor(d.classId)}">${d.name}</span>
+                        </td>
+                        <td style="color:${rColor}; font-weight: 800; font-size: 1.05rem; font-family: 'Outfit', sans-serif;">${d.rating}</td>
+                        <td style="color:var(--text-dim); font-weight: 500;">${d.peak}</td>
+                        <td style="color:var(--text-muted);">${d.matches}</td>
+                        <td style="color:${wColor}; font-weight: 600;">${d.winrate.toFixed(1)}%</td>
+                        <td><canvas id="spark-${d.charId}" width="100" height="30"></canvas></td>
+                    </tr>
+                `;
+            }).join('');
+
+            page.forEach(d => {
+                if (d.history.length < 2) return;
+                const ctx = document.getElementById(`spark-${d.charId}`)?.getContext('2d');
+                if (!ctx) return;
+                const points = d.history.map(h => h[1]);
+                const [min, max] = [Math.min(...points), Math.max(...points)];
+                const range = (max - min) || 1, step = 100 / (points.length - 1);
+
+                ctx.beginPath();
+                ctx.strokeStyle = getRatingColor(d.rating);
+                ctx.lineWidth = 1.5;
+                points.forEach((p, i) => ctx[i ? 'lineTo' : 'moveTo'](i * step, 30 - ((p - min) / range) * 26 - 2));
+                ctx.stroke();
+            });
+
+            $('elo-tbody').querySelectorAll('tr').forEach(row => {
+                row.addEventListener('click', () => {
+                    const name = row.dataset.name;
+                    switchTab('players');
+                    $('player-search').value = name;
+                    $('player-search').dispatchEvent(new Event('input'));
+                    // Need to wait slightly for search results to popup, then click first
+                    setTimeout(() => {
+                        const firstRes = document.querySelector('.search-result-item');
+                        if (firstRes) firstRes.click();
+                    }, 50);
+                });
+            });
+
+            const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+            $('elo-pagination').style.display = totalPages > 1 ? 'flex' : 'none';
+            $('elo-page-info').textContent = `Page ${currentPage + 1} of ${totalPages} · ${filteredData.length} players`;
+            $('elo-prev').disabled = currentPage === 0;
+            $('elo-next').disabled = currentPage >= totalPages - 1;
+        }
+
+        function applyFilters() {
+            filteredData = allData.filter(d => d.matches >= minMatches && (!searchQuery || d.name.toLowerCase().includes(searchQuery)));
+            filteredData.sort((a, b) => sortDir === 'asc' ?
+                (sortKey === 'name' ? a.name.localeCompare(b.name) : a[sortKey] - b[sortKey]) :
+                (sortKey === 'name' ? b.name.localeCompare(a.name) : b[sortKey] - a[sortKey]));
+            currentPage = 0;
+            renderTable();
+        }
+
+        $('elo-loading').style.display = 'none';
+        $('elo-table').style.display = 'table';
+
+        renderStats();
+        renderCharts();
+        applyFilters();
+
+        $('elo-search').addEventListener('input', e => { searchQuery = e.target.value.trim().toLowerCase(); applyFilters(); });
+        document.querySelectorAll('#elo-min-pills .filter-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('#elo-min-pills .filter-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                minMatches = parseInt(pill.dataset.min);
+                applyFilters();
+            });
+        });
+
+        document.querySelectorAll('.elo-table th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                sortDir = (sortKey === th.dataset.sort && sortDir === 'desc') ? 'asc' : 'desc';
+                sortKey = th.dataset.sort;
+                document.querySelectorAll('.elo-table th').forEach(h => h.classList.remove('sorted'));
+                th.classList.add('sorted');
+                applyFilters();
+            });
+        });
+
+        $('elo-prev').addEventListener('click', () => { if (currentPage > 0) { currentPage--; renderTable(); } });
+        $('elo-next').addEventListener('click', () => { if (currentPage < Math.ceil(filteredData.length / PAGE_SIZE) - 1) { currentPage++; renderTable(); } });
     }
 
 });
