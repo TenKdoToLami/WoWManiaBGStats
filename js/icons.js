@@ -72,10 +72,8 @@ const WoWIcons = (() => {
         const parts = code.split('-');
         if (parts.length !== 2) return code;
         const raceId = parseInt(parts[0]);
-        const genderId = parseInt(parts[1]);
         const raceName = raceIdToName[raceId] || 'Unknown';
-        const gender = genderMap[genderId] || '';
-        return `${raceName} ${gender}`.trim();
+        return raceName;
     }
 
     // Race code to faction
