@@ -194,8 +194,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sqlPromise = initSqlJs({
             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
         });
-        // Mandatory cache buster to bypass browser/proxy persistence
-        const dataPromise = fetch("data/pvpstats.db?t=" + Date.now()).then(res => res.arrayBuffer());
+        // GitHub Pages CDN handles cache invalidation on push — no cache buster needed
+        const dataPromise = fetch("data/pvpstats.db").then(res => res.arrayBuffer());
 
         const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
 
