@@ -4,13 +4,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Chart.js Global Defaults
     // ===================================
     Chart.defaults.color = '#94a3b8';
-    Chart.defaults.font.family = "'Outfit', sans-serif";
-    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
-    Chart.defaults.plugins.tooltip.titleColor = '#f8fafc';
-    Chart.defaults.plugins.tooltip.padding = 10;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
-    Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+    Chart.defaults.font.family = "'Inter', 'Outfit', sans-serif";
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(11, 17, 32, 0.95)';
+    Chart.defaults.plugins.tooltip.titleColor = '#f1f5f9';
+    Chart.defaults.plugins.tooltip.titleFont = { family: "'Outfit', sans-serif", weight: 700, size: 13 };
+    Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', sans-serif", size: 12 };
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 12;
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(139, 92, 246, 0.15)';
     Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.elements.bar.borderRadius = 6;
+    Chart.defaults.elements.line.borderWidth = 2.5;
+    Chart.defaults.elements.point.hoverRadius = 6;
+    Chart.defaults.elements.point.hoverBackgroundColor = '#8b5cf6';
 
     // ===================================
     // Shorthand references
@@ -215,6 +221,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (overlay) overlay.classList.add('hidden');
             if (container) container.classList.add('loaded');
+
+            // Initialize scroll animations after content is visible
+            initScrollAnimations();
         }, 600);
 
         // If misc tab is active at load, init it now
@@ -228,6 +237,100 @@ document.addEventListener('DOMContentLoaded', async () => {
         $('total-matches').innerText = "Error loading DB";
         const overlay = document.getElementById('loading-overlay');
         if (overlay) overlay.classList.add('hidden');
+    }
+
+    // ===================================
+    // SCROLL ANIMATIONS (IntersectionObserver)
+    // ===================================
+    function initScrollAnimations() {
+        const animatedElements = document.querySelectorAll('.card, .leaderboard-panel, .kpi-card, .insight-card, .analytics-divider');
+        
+        // Immediately mark elements already in view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Stagger delay for grid siblings
+                    const parent = entry.target.parentElement;
+                    const siblings = parent ? Array.from(parent.children).filter(c => c.matches('.card, .leaderboard-panel, .kpi-card, .insight-card')) : [];
+                    const siblingIndex = siblings.indexOf(entry.target);
+                    const delay = Math.min(siblingIndex * 60, 300);
+
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.05,
+            rootMargin: '0px 0px -30px 0px'
+        });
+
+        animatedElements.forEach(el => {
+            // Skip elements inside profile/match detail (they animate themselves)
+            if (el.closest('.player-profile-section') || el.closest('.match-detail-section')) {
+                el.classList.add('visible');
+                return;
+            }
+            observer.observe(el);
+        });
+    }
+
+    // ===================================
+    // ANIMATED NUMBER COUNTING
+    // ===================================
+    function animateCount(element, target, duration = 1200) {
+        if (!element) return;
+        const isFormatted = typeof target === 'string';
+        const numericTarget = isFormatted ? parseFloat(target.replace(/[^0-9.]/g, '')) : target;
+        if (isNaN(numericTarget) || numericTarget === 0) {
+            element.textContent = target;
+            return;
+        }
+        
+        const suffix = isFormatted ? (target.match(/[A-Za-z]+$/) || [''])[0] : '';
+        const startTime = performance.now();
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * numericTarget);
+            
+            if (suffix) {
+                element.textContent = current.toLocaleString() + suffix;
+            } else if (isFormatted) {
+                element.textContent = current.toLocaleString();
+            } else {
+                element.textContent = current.toLocaleString();
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                element.textContent = isFormatted ? target : numericTarget.toLocaleString();
+            }
+        }
+        requestAnimationFrame(update);
+    }
+
+    // ===================================
+    // SCROLL-TO-TOP BUTTON
+    // ===================================
+    const scrollTopBtn = document.getElementById('scroll-to-top');
+    if (scrollTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     }
 
     // ===================================
@@ -293,11 +396,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 4. Update Global Totals
             const resMatches = db.exec("SELECT COUNT(*) FROM matches");
             const total_matches = resMatches[0].values[0][0] || 0;
-            if ($('total-matches')) $('total-matches').innerText = total_matches.toLocaleString();
+            animateCount($('total-matches'), total_matches, 1400);
 
             const resPlayers = db.exec("SELECT COUNT(*) FROM character_map WHERE id > 0");
             const total_players = resPlayers[0].values[0][0] || 0;
-            if ($('total-players')) $('total-players').innerText = total_players.toLocaleString();
+            animateCount($('total-players'), total_players, 1400);
 
             const resWins = db.exec(`
                 SELECT winner_id, COUNT(*) as wins
@@ -314,8 +417,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
 
-            if ($('horde-wins')) $('horde-wins').innerText = hordeWins.toLocaleString();
-            if ($('alliance-wins')) $('alliance-wins').innerText = allianceWins.toLocaleString();
+            animateCount($('horde-wins'), hordeWins, 1200);
+            animateCount($('alliance-wins'), allianceWins, 1200);
 
             const total = hordeWins + allianceWins;
             if (total > 0) {
@@ -636,6 +739,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = res[0].values.map(d => d[1]);
 
             const ctx = $('playerActivityChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
+            gradient.addColorStop(1, 'rgba(139, 92, 246, 0.01)');
+            
             activeCharts.playerActivity = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -643,8 +750,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     datasets: [{
                         label: 'Matches',
                         data,
-                        borderColor: 'rgba(99, 102, 241, 1)',
-                        backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        backgroundColor: gradient,
                         fill: true,
                         tension: 0.35,
                         pointRadius: 2,
@@ -1392,6 +1499,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = resActivity[0].values.map(d => d[1]);
 
             const ctx = $('activityChart').getContext('2d');
+            
+            // Create gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
+            gradient.addColorStop(0.5, 'rgba(6, 182, 212, 0.1)');
+            gradient.addColorStop(1, 'rgba(139, 92, 246, 0.01)');
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1399,8 +1513,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     datasets: [{
                         label: 'Matches per Month',
                         data,
-                        borderColor: 'rgba(99, 102, 241, 1)',
-                        backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        backgroundColor: gradient,
                         fill: true,
                         tension: 0.35,
                         pointRadius: 0,
@@ -1414,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     interaction: { mode: 'index', intersect: false },
                     scales: {
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.03)' },
+                            grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
                             ticks: {
                                 maxTicksLimit: 16,
                                 callback: function (val) {

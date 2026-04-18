@@ -7,7 +7,7 @@
     <title>WoW-Mania BG Analytics</title>
     <meta name="description"
         content="Comprehensive PvP battleground analytics for WoW-Mania — tracking 27,000+ matches and 380,000+ player records from 2015 to 2026.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -68,20 +68,40 @@
             <!-- Player Profile (hidden by default, shown on search) -->
             <div class="player-profile-section hidden" id="player-profile">
                 <div class="card full-width profile-card">
+                    <!-- Faction gradient banner -->
+                    <div class="profile-banner" id="profile-banner"></div>
+
                     <div class="profile-header">
                         <div class="profile-identity">
-                            <div class="profile-icons" id="profile-icons"></div>
+                            <div class="profile-avatar" id="profile-avatar">
+                                <!-- Big class icon with glowing ring -->
+                            </div>
                             <div>
                                 <h2 class="profile-name" id="profile-name">—</h2>
                                 <p class="profile-subtitle" id="profile-subtitle">—</p>
+                                <div class="profile-badges" id="profile-badges">
+                                    <!-- Faction/race icons as small badges -->
+                                </div>
                             </div>
                         </div>
                         <button class="profile-close" id="profile-close" title="Close profile">&times;</button>
                     </div>
-                    <div class="profile-stats-grid" id="profile-stats-header">
-                        <!-- Injected: Matches, Win Rate, Record, KD -->
+
+                    <!-- Recent Form (last 10 matches) -->
+                    <div class="profile-form-strip" id="profile-form-strip">
+                        <span class="form-label">Recent Form</span>
+                        <div class="form-dots" id="profile-form-dots">
+                            <!-- W/L dots injected -->
+                        </div>
+                        <span class="form-summary" id="profile-form-summary"></span>
                     </div>
 
+                    <!-- 6 Stat KPI Cards -->
+                    <div class="profile-stats-grid" id="profile-stats-header">
+                        <!-- Injected: Matches, Win Rate, Record, KD, Avg HK, Total Honor -->
+                    </div>
+
+                    <!-- Performance Breakdown Table -->
                     <div class="profile-main-grid">
                         <div class="profile-stats-container">
                             <div class="profile-table-card">
@@ -102,6 +122,12 @@
                         </div>
                     </div>
 
+                    <!-- Best / Worst Match Highlights -->
+                    <div class="profile-highlights-grid" id="profile-highlights">
+                        <!-- Injected: best damage match, best healing match, best KB match -->
+                    </div>
+
+                    <!-- Charts -->
                     <div class="profile-charts-grid">
                         <div class="card chart-card">
                             <h3>📈 Activity Over Time</h3>
@@ -117,7 +143,14 @@
                         </div>
                     </div>
 
+                    <!-- BG Win Rate Bars + Map Breakdown -->
                     <div class="profile-details-grid">
+                        <div class="profile-detail-panel">
+                            <h3>⚔️ Win Rate by Battleground</h3>
+                            <div class="detail-list" id="player-bg-winrate-list">
+                                <!-- Injected: per-BG win rates -->
+                            </div>
+                        </div>
                         <div class="profile-detail-panel">
                             <h3>🗺️ Played by Map</h3>
                             <div class="detail-list" id="player-map-list">
@@ -132,16 +165,18 @@
                         </div>
                         <div class="profile-detail-panel full-width">
                             <h3>📊 Recent Match History</h3>
-                            <div class="leaderboard-table-wrap" style="max-height: 340px;">
+                            <div class="leaderboard-table-wrap" style="max-height: 400px;">
                                 <table class="leaderboard-table" id="player-match-history">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
                                             <th>BG</th>
                                             <th>Result</th>
+                                            <th>HK</th>
+                                            <th>KB</th>
+                                            <th>Deaths</th>
                                             <th>Dmg</th>
                                             <th>Heal</th>
-                                            <th>KB</th>
                                             <th>Obj</th>
                                         </tr>
                                     </thead>
@@ -689,8 +724,11 @@
         </footer>
     </div>
 
-    <script src="js/icons.js?v=4"></script>
-    <script src="js/main.js?v=4"></script>
+    <!-- Scroll-to-top button -->
+    <button class="scroll-to-top" id="scroll-to-top" title="Back to top">↑</button>
+
+    <script src="js/icons.js?v=5"></script>
+    <script src="js/main.js?v=5"></script>
 </body>
 
 </html>
