@@ -172,6 +172,13 @@
                             </div>
                         </div>
                         <div class="profile-detail-panel full-width">
+                            <h3>⚔️ ELO Rating History</h3>
+                            <div class="chart-container" style="height: 250px; margin-bottom: 2rem;">
+                                <canvas id="playerEloHistoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="profile-detail-panel full-width">
                             <h3>📊 Recent Match History</h3>
                             <div class="leaderboard-table-wrap" style="max-height: 400px;">
                                 <table class="leaderboard-table" id="player-match-history">
@@ -862,18 +869,18 @@
                 style="display: flex; gap: 1.5rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap;">
                 <div class="tier-item"
                     style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
-                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #ef4444;"></div>
-                    &lt;1400 · Iron
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #cbd5e1;"></div>
+                    &lt;1400 · Silver
                 </div>
                 <div class="tier-item"
                     style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
-                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #94a3b8;"></div>
-                    1400–1600 · Silver
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #fbbf24;"></div>
+                    1400–1600 · Gold
                 </div>
                 <div class="tier-item"
                     style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
-                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #10b981;"></div>
-                    1600–1800 · Gold
+                    <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #0ea5e9;"></div>
+                    1600–1800 · Plat
                 </div>
                 <div class="tier-item"
                     style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
@@ -883,7 +890,7 @@
                 <div class="tier-item"
                     style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-dim);">
                     <div class="tier-dot" style="width:10px;height:10px;border-radius:3px;background: #f59e0b;"></div>
-                    2200+ · Legendary
+                    2200+ · Master
                 </div>
             </div>
 
@@ -971,8 +978,8 @@
     <!-- Scroll-to-top button -->
     <button class="scroll-to-top" id="scroll-to-top" title="Back to top">↑</button>
 
-    <script src="js/icons.js?v=7"></script>
-    <script src="js/main.js?v=7"></script>
+    <script src="js/icons.js?v=11"></script>
+    <script src="js/main.js?v=11"></script>
 </body>
 
 </html>

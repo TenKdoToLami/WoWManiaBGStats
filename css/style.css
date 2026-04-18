@@ -999,7 +999,7 @@ input[type="number"] {
 /* 6 Stat KPI Cards */
 .profile-stats-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 0.8rem;
     padding: 1.5rem 2.5rem;
 }
@@ -1638,7 +1638,7 @@ input[type="number"] {
 }
 
 .leaderboard-table-wrap {
-    max-height: 500px;
+    max-height: 800px;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(139, 92, 246, 0.15) transparent;

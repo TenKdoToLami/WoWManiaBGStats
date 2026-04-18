@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Force cache-buster so we don't hit "no such table" errors if the db updates
-        const dbUrl = `data/pvpstats_temp.db?t=${Date.now()}`;
+        const dbUrl = `data/pvpstats.db?t=${Date.now()}`;
         const dataPromise = fetch(dbUrl).then(res => res.arrayBuffer());
 
         const [SQL, buf] = await Promise.all([sqlPromise, dataPromise]);
@@ -604,6 +604,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             `);
             const mainFaction = facRes.length > 0 ? facRes[0].values[0][0] : 0;
 
+            // Get ELO Rating & History
+            let eloRating = '—';
+            let eloColor = 'var(--text-color)';
+            let ratingHistory = [];
+            try {
+                const eloRes = db.exec(`SELECT rating, rating_history FROM elo_ratings WHERE character_id = ${charId}`);
+                if (eloRes.length > 0 && eloRes[0].values.length > 0) {
+                    const r = Math.round(eloRes[0].values[0][0]);
+                    eloRating = r;
+                    if (r >= 2200) eloColor = '#f59e0b';
+                    else if (r >= 1800) eloColor = '#8b5cf6';
+                    else if (r >= 1600) eloColor = '#0ea5e9';
+                    else if (r >= 1400) eloColor = '#fbbf24';
+                    else eloColor = '#cbd5e1';
+                    
+                    try {
+                        ratingHistory = JSON.parse(eloRes[0].values[0][1] || '[]');
+                    } catch(e) {}
+                }
+            } catch (e) {
+                // Ignore if table not ready
+            }
+
             // 1. Render Banner
             const banner = $('profile-banner');
             banner.className = 'profile-banner ' + (mainFaction === 1 ? 'horde-banner' : mainFaction === 2 ? 'alliance-banner' : '');
@@ -625,9 +648,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             // 5. Render Recent Form (last 20 matches as W/L dots)
             renderRecentForm(charId);
 
-            // 6. Render 6 Stat KPI Cards
+            // 6. Render 5 Stat KPI Cards
             const wrColor = parseFloat(winRate) >= 55 ? 'var(--accent)' : parseFloat(winRate) >= 45 ? 'var(--accent-warm)' : 'var(--horde-color)';
             $('profile-stats-header').innerHTML = `
+                <div class="profile-stat">
+                    <div class="profile-stat-value" style="color: ${eloColor}; text-shadow: 0 0 10px ${eloColor}44;">${eloRating}</div>
+                    <div class="profile-stat-label">ELO Rating</div>
+                </div>
                 <div class="profile-stat">
                     <div class="profile-stat-value">${totalMatches.toLocaleString()}</div>
                     <div class="profile-stat-label">Matches</div>
@@ -643,14 +670,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="profile-stat">
                     <div class="profile-stat-value">${kd}</div>
                     <div class="profile-stat-label">K/D Ratio</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">${avgHk}</div>
-                    <div class="profile-stat-label">Avg HK / Match</div>
-                </div>
-                <div class="profile-stat">
-                    <div class="profile-stat-value">${Icons.formatNumber(totalHonor)}</div>
-                    <div class="profile-stat-label">Total Honor</div>
                 </div>
             `;
 
@@ -681,6 +700,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             $('player-profile').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             // 9. Render Charts & Breakdowns
+            renderPlayerEloHistoryChart(ratingHistory);
             renderPlayerActivityChart(charId);
             renderPlayerBgChart(charId);
             renderPlayerBgWinRates(charId);
@@ -891,6 +911,72 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
             }).join('');
         } catch (e) { console.error(`Breakdown error (${type}):`, e); }
+    }
+
+    function renderPlayerEloHistoryChart(history) {
+        destroyChart('playerEloHistory');
+        const ctx = $('playerEloHistoryChart')?.getContext('2d');
+        if (!ctx || !history || history.length < 2) {
+            // If not enough data, maybe hide or show empty state?
+            if (ctx) {
+                ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+                ctx.font = "14px Inter";
+                ctx.fillStyle = "#94a3b8";
+                ctx.textAlign = "center";
+                ctx.fillText("Not enough history for a detailed chart", ctx.canvas.width/2, ctx.canvas.height/2);
+            }
+            return;
+        }
+
+        const labels = history.map((_, i) => i + 1);
+        const data = history.map(h => h[1]); // [match_id, rating]
+        
+        const mainColor = '#8b5cf6'; // Default Diamond/Purple feel
+
+        activeCharts['playerEloHistory'] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Rating',
+                    data: data,
+                    borderColor: mainColor,
+                    backgroundColor: mainColor + '11',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        display: true,
+                        title: { display: true, text: 'Matches Played', color: '#94a3b8' },
+                        grid: { display: false }
+                    },
+                    y: {
+                        display: true,
+                        title: { display: true, text: 'ELO Rating', color: '#94a3b8' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            title: (items) => `Match #${items[0].label}`,
+                            label: (item) => ` Rating: ${Math.round(item.raw)}`
+                        }
+                    }
+                }
+            }
+        });
     }
 
     function renderPlayerActivityChart(charId) {
@@ -2303,24 +2389,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         let sortKey = 'rating';
         let sortDir = 'desc';
         let currentPage = 0;
-        const PAGE_SIZE = 50;
+        const PAGE_SIZE = 100;
         let minMatches = 25;
         let searchQuery = '';
 
         function getRatingColor(rating) {
-            if (rating >= 2200) return '#f59e0b';
-            if (rating >= 1800) return '#8b5cf6';
-            if (rating >= 1600) return '#10b981';
-            if (rating >= 1400) return '#94a3b8';
-            return '#ef4444';
+            if (rating >= 2200) return '#f59e0b'; // Master
+            if (rating >= 1800) return '#8b5cf6'; // Diamond
+            if (rating >= 1600) return '#0ea5e9'; // Plat (blue-ish)
+            if (rating >= 1400) return '#fbbf24'; // Gold
+            return '#cbd5e1';                     // Silver
         }
 
         function getRatingTier(rating) {
-            if (rating >= 2200) return 'Legendary';
+            if (rating >= 2200) return 'Master';
             if (rating >= 1800) return 'Diamond';
-            if (rating >= 1600) return 'Gold';
-            if (rating >= 1400) return 'Silver';
-            return 'Iron';
+            if (rating >= 1600) return 'Plat';
+            if (rating >= 1400) return 'Gold';
+            return 'Silver';
         }
 
         try {
@@ -2498,15 +2584,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             $('elo-tbody').querySelectorAll('tr').forEach(row => {
                 row.addEventListener('click', () => {
+                    const charId = parseInt(row.dataset.charId);
                     const name = row.dataset.name;
                     switchTab('players');
                     $('player-search').value = name;
-                    $('player-search').dispatchEvent(new Event('input'));
-                    // Need to wait slightly for search results to popup, then click first
-                    setTimeout(() => {
-                        const firstRes = document.querySelector('.search-result-item');
-                        if (firstRes) firstRes.click();
-                    }, 50);
+                    loadPlayerProfile(charId);
                 });
             });
 
